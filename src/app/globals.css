@@ -1685,9 +1685,8 @@ footer h3 {
 .footer-socials a {
   display: grid;
   place-items: center;
-
-  width: clamp(26px, 3vw, 38px);
-  height: clamp(26px, 3vw, 38px);
+  width: clamp(20px, 3vw, 32px);
+  height: clamp(20px, 3vw, 32px);
   margin: 0;
 
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1814,8 +1813,7 @@ footer h3 {
   .revenue,
   .intro,
   .process-head,
-  .process-row,
-  footer {
+  .process-row {
     grid-template-columns: 1fr;
   }
 
@@ -1949,7 +1947,7 @@ footer h3 {
   }
 
   .revenue {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-columns: 1fr;
     min-height: auto;
     gap: 38px;
     padding: 58px 28px;
@@ -1963,9 +1961,37 @@ footer h3 {
     max-width: 420px;
   }
 
+  footer {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px 18px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-brand-top {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 20px;
+  }
+
+  .footer-brand-top > img {
+    grid-column: 1 / -1;
+  }
+
+  .footer-social-wrap {
+    justify-self: end;
+  }
+
+  footer > div:nth-child(2),
+  footer > div:nth-child(3),
+  footer > div:nth-child(4) {
+    padding-top: 0;
+  }
+
   .footer-bottom {
-    grid-template-columns: 1fr;
-    justify-items: start;
+    margin-top: 8px;
   }
 
 }
@@ -2051,7 +2077,7 @@ footer h3 {
   }
 
   .revenue h2 {
-    font-size: clamp(25px, 7vw, 36px);
+    font-size: clamp(30px, 9vw, 44px);
   }
 
   .revenue h2 span {
@@ -2060,13 +2086,13 @@ footer h3 {
   }
 
   .revenue-image {
-    width: 70px;
-    height: 40px;
-    margin-right: 8px;
+    width: 2.2em;
+    height: 1.15em;
+    margin-right: 0.3em;
   }
 
   .revenue {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    grid-template-columns: 1fr;
     gap: 18px;
     padding: 46px 18px;
   }
@@ -2091,5 +2117,18 @@ footer h3 {
   .process-head p {
     font-size: 13px;
     line-height: 1.35;
+  }
+
+  footer {
+    gap: 24px 12px;
+  }
+
+  footer h3 {
+    font-size: 12px;
+  }
+
+  footer p,
+  footer a {
+    font-size: 11px;
   }
 }
