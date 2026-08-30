@@ -38,35 +38,40 @@ const services: Array<[string, LucideIcon]> =
   ["UI/UX Design", PenTool],
   ["Graphic Design", Palette],
   ["Branding", Gem],
-  ["Digital Marketing", Megaphone],
+  ["Digital Analytics", Megaphone],
   
 ];
 
 const works = [
   {
     title: "Branding Design",
-    text: "Build a unique website Teamollo.Webflow template",
+    text: "Create distinctive brand identities with thoughtful visuals, memorable direction, and a consistent look across every touchpoint.",
     image: "/brand design.png",
+    tags: ["Branding", "Strategy", "Creative"],
   },
   {
     title: "Application Design",
-    text: "Build a unique website Teamollo.Webflow template",
+    text: "Design intuitive and engaging mobile experiences that combine clean interfaces, smooth interactions, and user-focused functionality.",
     image: "/app design.png",
+    tags: ["UI/UX", "Mobile", "Digital"],
   },
   {
     title: "AI-Powered Chatbots",
     text: "Build intelligent AI chatbots that answer questions, engage customers, capture leads, automate support, and deliver personalized experiences across your website, WhatsApp, and digital platforms.",
     image: "/ai poweres.png",
+    tags: ["AI", "Automation", "Support"],
   },
   {
     title: "Packaging Design",
-    text: "Build a unique website Teamollo.Webflow template",
+    text: "Create eye-catching packaging that communicates your brand clearly while making your products stand out on the shelf and online.",
     image: "/packageing.png",
+    tags: ["Packaging", "Branding", "Creative"],
   },
   {
     title: "Website Design",
-    text: "Build a unique website Teamollo.Webflow template",
+    text: "Build modern, responsive websites that combine strong visual design, intuitive experiences, and clear communication for your business.",
     image: "/web design.png",
+    tags: ["Web", "Design", "Strategy"],
   },
 ];
 
@@ -151,22 +156,22 @@ const faqs = [
 const processSteps = [
   {
     title: "Discover",
-    text: "Welcome Studio gives you all the tools you need to create and host virtual experiences that look awesome and put your brand centerstage.",
+    text: "We understand your business, goals, audience, and what you need to achieve.",
     image: "/one.avif",
   },
   {
     title: "Design",
-    text: "Cut through the yawns, grab your audience's attention, and turn passive attendees into active participants.",
+    text: "We create clean, intuitive designs and refine them with your feedback.",
     image: "/two.avif",
   },
   {
     title: "Build",
-    text: "Track the success of your events with deep insights and analytics measured across the entire attendee experience.",
+    text: "We develop your solution with modern technology, testing, and regular updates.",
     image: "/three.avif",
   },
   {
     title: "Launch & Support",
-    text: "Track the success of your events with deep insights and analytics measured across the entire attendee experience.",
+    text: "We launch your product and provide ongoing support to keep everything running smoothly.",
     image: "/four.avif",
   },
 ];
@@ -175,56 +180,56 @@ const testimonials = [
   {
     quote: "Love how you can take raw footage and turn it into a professional video with AI.",
     name: "Ram Sherpa",
-    role: "CMO at HubSpot",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "It makes video editing much, much easier.",
     name: "Kiran",
-    role: "CMO at Zapier",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "Having spent years editing video, Capsule is absolutely mindblowing.",
     name: "xitiz shrestha",
-    role: "Founder at DesignFriend",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "Would have saved a day in Adobe and looks better in less than half the time.",
     name: "Raj lama",
-    role: "VP of Marketing",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "Capsule checks all the boxes for creating engaging videos at scale.",
     name: "Shivam Shresthas",
-    role: "Comms Manager at University of Nebraska",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "Capsule significantly improves the time it takes to create video.",
     name: "Bishnu Shrestha",
-    role: "Digital and Social Strategist at RedPeg",
+    role: "Founder of",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "There is Apple and then there's Capsule's UX and UI. This is world-class execution.",
     name: "Kiran Thapa",
-    role: "Founder and CEO at Build in Public",
+    role: "Founder ",
     image:
       "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=160&q=80",
   },
   {
     quote: "Great job making this tech accessible!",
     name: "Eslin rai",
-    role: "Founder and CEO at Stability AI",
+    role: "Founder",
     image:
       "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=160&q=80",
   },
@@ -473,9 +478,9 @@ export default function Home() {
               <h2 data-reveal="up">{work.title}</h2>
               <p data-reveal="up">{work.text}</p>
               <div className="tags" data-reveal="up">
-                <span>Design</span>
-                <span>Strategy</span>
-                <span>Digital</span>
+                {work.tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
               </div>
             </div>
             <div className="work-media" data-reveal="up">
@@ -505,7 +510,7 @@ export default function Home() {
       <section className="revenue">
         <div className="revenue-title" data-reveal="left">
           <h2 data-reveal="up">
-            <span>Drive</span>
+            <span>Move</span>
             <span>
               <span className="revenue-image">
                 <Image
@@ -515,36 +520,36 @@ export default function Home() {
                   sizes="190px"
                 />
               </span>
-              Revenue
+              Forward
             </span>
           </h2>
         </div>
         <div className="revenue-stats" data-reveal="right">
           <article data-reveal="up">
             <strong>
-              <CountUp value={87} prefix="+" suffix="%" />
+              <CountUp value={100} suffix="+" />
             </strong>
             <p>
-              increased attendee engagement
-              <span>at Bitwise</span>
+              Digital solutions delivered across
+              <span> web, app & AI</span>
             </p>
           </article>
           <article data-reveal="up">
             <strong>
-              <CountUp value={1.7} prefix="$" suffix="M" decimals={1} />
+              <CountUp value={1} suffix="K +" />
             </strong>
             <p>
-              pipeline generated
-              <span>at Everbridge</span>
+              Conversations powered by
+              <span>chatbots</span>
             </p>
           </article>
           <article data-reveal="up">
             <strong>
-              <CountUp value={58} suffix="%" />
+              <CountUp value={99} suffix="%" />
             </strong>
             <p>
-              attendee conversion rate
-              <span>at Interfolio</span>
+              Client satisfaction through reliable 
+              <span>digital solutions</span>
             </p>
           </article>
         </div>
@@ -555,9 +560,9 @@ export default function Home() {
           <h2 data-reveal="left">How We Work</h2>
           <div data-reveal="right">
             <p data-reveal="up">
-              Manage your experience from start to finish, from integrations to
-              registration and from interactive stage elements to post-event
-              data, it&apos;s all here.
+              We keep things simple, transparent, and focused, turning complex ideas
+               into digital solutions that are practical, purposeful, and built for 
+               real business needs.
             </p>
             <a href="#" data-reveal="up">Learn more</a>
           </div>
@@ -704,15 +709,15 @@ export default function Home() {
               <div className="footer-socials">
                 <a href="#" aria-label="Facebook">
                   <Image
-                    src="https://cdn.simpleicons.org/facebook/ffffff"
+                    src="https://s.magecdn.com/social/mw-facebook.svg"
                     alt=""
                     width={18}
                     height={18}
                   />
                 </a>
-                <a href="#" aria-label="LinkedIn">
+                <a href="#" aria-label="Instagram">
                   <Image
-                    src="https://cdn.simpleicons.org/linkedin/ffffff"
+                    src="https://s.magecdn.com/social/mw-instagram.svg"
                     alt=""
                     width={18}
                     height={18}
@@ -720,7 +725,7 @@ export default function Home() {
                 </a>
                 <a href="#" aria-label="TikTok">
                   <Image
-                    src="https://cdn.simpleicons.org/tiktok/ffffff"
+                    src="https://s.magecdn.com/social/mw-tiktok.svg"
                     alt=""
                     width={18}
                     height={18}
