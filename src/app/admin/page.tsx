@@ -252,15 +252,13 @@ export default function AdminPage() {
                 value={draftBlog.content}
                 onChange={(v) => setDraftBlog({ ...draftBlog, content: v })}
                 rows={12}
-                placeholder={"## Heading\n\nParagraph text. Separate blocks with a blank line."}
+                placeholder="Write your post here…"
               />
               <p className="admin-hint">
-                Start a line with <code>## </code> to make a section heading — these
-                build the article table of contents. Also supports{" "}
-                <code>- bullets</code>, <code>1. numbered</code>,{" "}
-                <code>[link](url)</code>, <code>![alt](/img.png)</code>,{" "}
-                <code>**bold**</code>, <code>`code`</code> and{" "}
-                <code>&gt; quotes</code>.
+                Edit like a Word document — select text and use the toolbar to
+                make it <strong>bold</strong>, add headings, lists or links.
+                Sections marked <strong>Heading&nbsp;2</strong> automatically
+                appear in the article&apos;s table of contents.
               </p>
             </div>
             <div className="admin-form-actions">
@@ -354,13 +352,11 @@ export default function AdminPage() {
                 value={draftCareer.description}
                 onChange={(v) => setDraftCareer({ ...draftCareer, description: v })}
                 rows={5}
-                placeholder={"What the role involves…\n\n- Lead a squad of designers\n- [Learn more](https://example.com)"}
+                placeholder="Describe the role…"
               />
               <p className="admin-hint">
-                Supports <code>- bullets</code>, <code>1. numbered</code>,{" "}
-                <code>## headings</code>, <code>[link](url)</code>,{" "}
-                <code>![alt](/img.png)</code>, <code>**bold**</code> and{" "}
-                <code>&gt; quotes</code>.
+                Edit like a Word document — use the toolbar above to add bullet
+                points, links and headings. No special formatting codes needed.
               </p>
             </div>
             <div className="admin-form-actions">
@@ -434,14 +430,12 @@ export default function AdminPage() {
               value={draft.content}
               onChange={(v) => setDraft({ ...draft, content: v })}
               rows={16}
-              placeholder="Start each section with ## Heading, then a blank line and paragraphs."
+              placeholder="Write the page content here…"
             />
             <p className="admin-hint">
-              Start a line with <code>## </code> to make a section heading — these
-              build the on-page table of contents. Also supports{" "}
-              <code>- bullets</code>, <code>1. numbered</code>,{" "}
-              <code>[link](url)</code>, <code>![alt](/img.png)</code>,{" "}
-              <code>**bold**</code> and <code>&gt; quotes</code>.
+              Edit like a Word document — select text and use the toolbar to
+              format it. Sections marked <strong>Heading&nbsp;2</strong>{" "}
+              automatically build the table of contents on the page.
             </p>
           </div>
           <div className="admin-form-actions">
