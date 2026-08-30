@@ -1,0 +1,71 @@
+import { promises as fs } from "fs";
+import path from "path";
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  image?: string;
+  content: string;
+}
+
+export interface Career {
+  id: string;
+  title: string;
+  location: string;
+  type: string;
+  description: string;
+}
+
+export interface LegalPageData {
+  id?: string;
+  slug?: string;
+  title: string;
+  content: string;
+}
+
+export interface SiteContent {
+  blogs: BlogPost[];
+  privacyPolicy: LegalPageData;
+  terms: LegalPageData;
+  careers: Career[];
+}
+
+export const DEFAULT_CONTENT: SiteContent = {
+  blogs: [],
+  privacyPolicy: { title: "Privacy Policy", content: "" },
+  terms: { title: "Terms & Conditions", content: "" },
+  careers: [],
+};
+
+const DATA_DIR = path.join(process.cwd(), "src", "data");
+const DATA_FILE = path.join(DATA_DIR, "content.json");
+
+/** Reads the content store from disk. Falls back to empty defaults if missing/corrupt. */
+export async function readContent(): Promise<SiteContent> {
+  try {
+    const raw = await fs.readFile(DATA_FILE, "utf-8");
+    const parsed = JSON.parse(raw) as Partial<SiteContent>;
+    return {
+      blogs: Array.isArray(parsed.blogs) ? parsed.blogs : [],
+      privacyPolicy: parsed.privacyPolicy ?? DEFAULT_CONTENT.privacyPolicy,
+      terms: parsed.terms ?? DEFAULT_CONTENT.terms,
+      careers: Array.isArray(parsed.careers) ? parsed.careers : [],
+    };
+  } catch {
+    return {
+      blogs: [],
+      privacyPolicy: { ...DEFAULT_CONTENT.privacyPolicy },
+      terms: { ...DEFAULT_CONTENT.terms },
+      careers: [],
+    };
+  }
+}
+
+/** Writes the content store to disk. */
+export async function writeContent(content: SiteContent): Promise<void> {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(content, null, 2), "utf-8");
+}

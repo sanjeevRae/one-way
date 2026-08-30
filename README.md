@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# One Way Nepal — CMS & Website
 
-## Getting Started
+Next.js app with an **admin panel** to edit blogs, privacy policy, terms &
+conditions, and careers. Content persists to **either** a local JSON file
+(no setup needed) **or** a MySQL database (for Spaceship hosting).
 
-First, run the development server:
+## Quick start (local, no database)
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site uses `src/data/content.json` automatically when no database env vars
+are set — nothing else to configure.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Website: http://localhost:3000
+- Admin: http://localhost:3000/admin
+- API: http://localhost:3000/api/content (GET / PUT)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What the admin can edit
 
-## Learn More
+| Tab | Content |
+|---|---|
+| Blogs | add / edit / delete posts (title, slug, date, excerpt, image, markdown body) |
+| Privacy Policy | page title + markdown body (headings build the on-page TOC) |
+| Terms & Conditions | page title + markdown body (headings build the on-page TOC) |
+| Careers | add / edit / delete jobs (title, location, type, markdown description) |
 
-To learn more about Next.js, take a look at the following resources:
+### Supported markdown in all text areas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+## Section heading          →  builds the table of contents
+### Sub heading
+- bullet item              →  <ul>
+1. numbered item           →  <ol>
+[link text](https://url)   →  hyperlink
+![alt text](/img.png)      →  image
+**bold**, *italic*         →  inline styling
+`inline code`
+> a quoted paragraph       →  <blockquote>
+---                        →  horizontal rule
+https://example.com        →  auto-linked
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment on Spaceship (Node.js + MySQL)
 
-## Deploy on Vercel
+### 1. Create the MySQL database & tables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+In the Spaceship panel, create a MySQL database (e.g. `oneway_nepal`). Then run
+the schema file from this repository as your database user:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+mysql -u <USERNAME> -p -h <HOST> <DATABASE_NAME> < src/data/schema.sql
+```
+
+The file creates `blogs`, `careers`, `legal_pages` and `site_settings`, and
+seeds the two legal pages. It is idempotent — safe to re-run.
+
+### 2. Set environment variables on Spaceship
+
+Add these env vars to your Node.js app in the Spaceship dashboard
+(see `.env.example`):
+
+```bash
+DATABASE_HOST=your-db-host
+DATABASE_PORT=3306
+DATABASE_USER=your-db-user
+DATABASE_PASSWORD=your-db-password
+DATABASE_NAME=oneway_nepal
+```
+
+Or a single connection string:
+
+```bash
+DATABASE_URL=mysql://USER:PASS@HOST:3306/oneway_nepal
+```
+
+### 3. Build & run
+
+```bash
+npm run build
+npm run start
+```
+
+When env vars are set, the site reads/writes MySQL. Without them it falls back
+to the JSON file — so the same code works on local and server.
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── admin/page.tsx          # admin panel (client component)
+│   ├── api/content/route.ts    # GET/PUT API
+│   ├── blogs/                  # blog list + detail
+│   ├── privacy-policy/         # legal page with sidebar TOC
+│   ├── terms-and-conditions/   # legal page with sidebar TOC
+│   └── careers/                # job listings
+├── components/
+│   ├── ContentShell.tsx        # shared subpage layout
+│   ├── ContentRenderer.tsx     # markdown → HTML + TOC
+│   └── SmoothToc.tsx           # client scroll-spy sidebar TOC
+├── data/
+│   ├── content.json            # JSON fallback store (local)
+│   └── schema.sql              # MySQL schema + seed (Spaceship)
+└── lib/
+    ├── content.ts              # types + JSON read/write
+    ├── db.ts                   # MySQL ⇄ JSON abstraction
+    └── format.ts               # date helpers
+```
+
+## Security note
+
+`/admin` currently has **no authentication**. Add a password gate before
+exposing publicly. The `/api/content` PUT endpoint should be protected too.
+
+## Scripts
+
+```bash
+npm run dev      # development
+npm run build    # production build
+npm run start    # run production build
+npm run lint     # eslint
+```

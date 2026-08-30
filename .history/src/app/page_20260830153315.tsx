@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -158,22 +157,22 @@ const processSteps = [
   {
     title: "Discover",
     text: "We understand your business, goals, audience, and what you need to achieve.",
-    image: "/discove.png",
+    image: "/2.png",
   },
   {
     title: "Design",
     text: "We create clean, intuitive designs and refine them with your feedback.",
-    image: "/designn.png",
+    image: "/design.png",
   },
   {
     title: "Build",
     text: "We develop your solution with modern technology, testing, and regular updates.",
-    image: "/buildd.png",
+    image: "/build.png",
   },
   {
     title: "Launch & Support",
     text: "We launch your product and provide ongoing support to keep everything running smoothly.",
-    image: "/lunch&supportt.png",
+    image: "/lunch&support.png",
   },
 ];
 
@@ -532,7 +531,7 @@ export default function Home() {
             <span>
               <span className="revenue-image">
                 <Image
-                  src="/moveforward.png"
+                  src="/driven reneview.png"
                   alt="Revenue dashboard preview"
                   fill
                   sizes="190px"
@@ -756,30 +755,24 @@ export default function Home() {
         </div>
         <div data-reveal="up">
           <h3>Product</h3>
-          <a href="/#services">Features</a>
-          <a href="/#contact">Pricing</a>
-          <a href="/#work">Projects</a>
+          <a>Features</a>
+          <a>Pricing</a>
+          <a>Projects</a>
         </div>
         <div data-reveal="up">
           <h3>Company</h3>
-          <a href="/#about">About</a>
-          <a href="/#work">Work</a>
-          <Link href="/careers">Careers</Link>
+          <a>About</a>
+          <a>Work</a>
+          <a>Careers</a>
         </div>
         <div data-reveal="up">
           <h3>Resources</h3>
-          <Link href="/blogs">Blogs</Link>
-          <Link href="/privacy-policy">Privacy Policy</Link>
-          <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
+          <a>Blogs</a>
+          <a>Privacy Policy</a>
+          <a>Terms & Conditions</a>
         </div>
         <div className="footer-bottom">
           <p>© 2026 OneWayNepal. All rights reserved.</p>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
         </div>
       </footer>
     </main>

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -47,31 +46,31 @@ const works = [
   {
     title: "Branding Design",
     text: "Create distinctive brand identities with thoughtful visuals, memorable direction, and a consistent look across every touchpoint.",
-    image: "/brand.png",
+    image: "/branding",
     tags: ["Branding", "Strategy", "Creative"],
   },
   {
     title: "Application Design",
     text: "Design intuitive and engaging mobile experiences that combine clean interfaces, smooth interactions, and user-focused functionality.",
-    image: "/app.png",
+    image: "/app design.png",
     tags: ["UI/UX", "Mobile", "Digital"],
   },
   {
     title: "AI-Powered Chatbots",
     text: "Build intelligent AI chatbots that answer questions, engage customers, capture leads, automate support, and deliver personalized experiences across your website, WhatsApp, and digital platforms.",
-    image: "/ai.png",
+    image: "/ai poweres.png",
     tags: ["AI", "Automation", "Support"],
   },
   {
     title: "Packaging Design",
     text: "Create eye-catching packaging that communicates your brand clearly while making your products stand out on the shelf and online.",
-    image: "/pack.png",
+    image: "/packageing.png",
     tags: ["Packaging", "Branding", "Creative"],
   },
   {
     title: "Website Design",
     text: "Build modern, responsive websites that combine strong visual design, intuitive experiences, and clear communication for your business.",
-    image: "/web2.png",
+    image: "/web design.png",
     tags: ["Web", "Design", "Strategy"],
   },
 ];
@@ -158,22 +157,22 @@ const processSteps = [
   {
     title: "Discover",
     text: "We understand your business, goals, audience, and what you need to achieve.",
-    image: "/discove.png",
+    image: "/one.avif",
   },
   {
     title: "Design",
     text: "We create clean, intuitive designs and refine them with your feedback.",
-    image: "/designn.png",
+    image: "/two.avif",
   },
   {
     title: "Build",
     text: "We develop your solution with modern technology, testing, and regular updates.",
-    image: "/buildd.png",
+    image: "/three.avif",
   },
   {
     title: "Launch & Support",
     text: "We launch your product and provide ongoing support to keep everything running smoothly.",
-    image: "/lunch&supportt.png",
+    image: "/four.avif",
   },
 ];
 
@@ -473,8 +472,8 @@ export default function Home() {
             really proud of what we&apos;ve achieved together.
           </p>
         </div>
-        {works.map((work, i) => {
-          const copy = (
+        {works.map((work) => (
+          <article className="work-row" key={work.title} data-reveal="up">
             <div className="work-copy" data-reveal="up">
               <h2 data-reveal="up">{work.title}</h2>
               <p data-reveal="up">{work.text}</p>
@@ -484,31 +483,14 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          );
-          const media = (
             <div className="work-media" data-reveal="up">
               <Image src={work.image} alt={work.title} fill sizes="(max-width: 820px) 100vw, 52vw" />
               <button aria-label={`Open ${work.title}`}>
                 <ArrowUpRight size={17} />
               </button>
             </div>
-          );
-          return (
-            <article className="work-row" key={work.title} data-reveal="up">
-              {i % 2 === 0 ? (
-                <>
-                  {copy}
-                  {media}
-                </>
-              ) : (
-                <>
-                  {media}
-                  {copy}
-                </>
-              )}
-            </article>
-          );
-        })}
+          </article>
+        ))}
       </section>
 
       <section className="cta-band" id="contact">
@@ -532,7 +514,7 @@ export default function Home() {
             <span>
               <span className="revenue-image">
                 <Image
-                  src="/moveforward.png"
+                  src="/driven reneview.png"
                   alt="Revenue dashboard preview"
                   fill
                   sizes="190px"
@@ -756,30 +738,24 @@ export default function Home() {
         </div>
         <div data-reveal="up">
           <h3>Product</h3>
-          <a href="/#services">Features</a>
-          <a href="/#contact">Pricing</a>
-          <a href="/#work">Projects</a>
+          <a>Features</a>
+          <a>Pricing</a>
+          <a>Projects</a>
         </div>
         <div data-reveal="up">
           <h3>Company</h3>
-          <a href="/#about">About</a>
-          <a href="/#work">Work</a>
-          <Link href="/careers">Careers</Link>
+          <a>About</a>
+          <a>Work</a>
+          <a>Careers</a>
         </div>
         <div data-reveal="up">
           <h3>Resources</h3>
-          <Link href="/blogs">Blogs</Link>
-          <Link href="/privacy-policy">Privacy Policy</Link>
-          <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
+          <a>Blogs</a>
+          <a>Privacy Policy</a>
+          <a>Terms & Conditions</a>
         </div>
         <div className="footer-bottom">
           <p>© 2026 OneWayNepal. All rights reserved.</p>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
         </div>
       </footer>
     </main>

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -756,30 +755,24 @@ export default function Home() {
         </div>
         <div data-reveal="up">
           <h3>Product</h3>
-          <a href="/#services">Features</a>
-          <a href="/#contact">Pricing</a>
-          <a href="/#work">Projects</a>
+          <a>Features</a>
+          <a>Pricing</a>
+          <a>Projects</a>
         </div>
         <div data-reveal="up">
           <h3>Company</h3>
-          <a href="/#about">About</a>
-          <a href="/#work">Work</a>
-          <Link href="/careers">Careers</Link>
+          <a>About</a>
+          <a>Work</a>
+          <a>Careers</a>
         </div>
         <div data-reveal="up">
           <h3>Resources</h3>
-          <Link href="/blogs">Blogs</Link>
-          <Link href="/privacy-policy">Privacy Policy</Link>
-          <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
+          <a>Blogs</a>
+          <a>Privacy Policy</a>
+          <a>Terms & Conditions</a>
         </div>
         <div className="footer-bottom">
           <p>© 2026 OneWayNepal. All rights reserved.</p>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
         </div>
       </footer>
     </main>
