@@ -1,0 +1,55 @@
+{
+  "blogs": [
+    {
+      "id": "blog-1",
+      "slug": "design-that-sells",
+      "title": "Design That Sells: Principles Behind High-Converting Websites",
+      "excerpt": "How intentional layout, hierarchy and pacing turn a beautiful website into a revenue engine.",
+      "date": "2026-08-12",
+      "content": "## Start with the business goal\n\nA beautiful website that does not convert is a poster. Before a single pixel is drawn, we define what success looks like: a booked call, a downloaded deck, a closed deal.\n\n## Hierarchy is everything\n\nThe eye follows a path. We stage information so the most important message lands first, then support it with evidence, proof and one clear call to action.\n\n## Motion with purpose\n\nMicro-interactions and scroll reveals should guide, never distract. Every animation earns its place by explaining the interface.\n\n## Measure and iterate\n\nLaunch is just the start. Heatmaps, session recordings and conversion data tell us what to refine next week, not next quarter."
+    },
+    {
+      "id": "blog-2",
+      "slug": "ai-chatbots-that-help",
+      "title": "AI Chatbots That Actually Help Your Customers",
+      "excerpt": "Rule-based bots frustrate. Here is how we build assistants that resolve, escalate and delight.",
+      "date": "2026-07-30",
+      "content": "## Why most chatbots fail\n\nMost bots are decision trees pretending to be intelligence. They answer the wrong question confidently and dead-end real customers into a queue.\n\n## Give the bot a knowledge base\n\nOur assistants are grounded in your actual product documentation, policies and past conversations, so answers stay accurate and on-brand.\n\n## Escalate gracefully\n\nA good bot knows its limits. When confidence drops, it hands off to a human with full context, no repeating the story.\n\n## Measure what matters\n\nWe track deflection rate, resolution rate and customer effort, not just \"messages handled\"."
+    }
+  ],
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "content": "## 1. Introduction\n\nOne Way Nepal (\"we\", \"our\") respects your privacy. This policy explains what information we collect when you use our website and services, and how we use and protect it.\n\n## 2. Information we collect\n\nWe collect information you provide directly, such as your name, email address and company details when you contact us or request a proposal. We also collect limited usage data, such as pages visited and referral sources, to improve our website.\n\n## 3. How we use your information\n\nWe use your information to respond to inquiries, deliver the services you request, send relevant updates, and improve our products and content.\n\n## 4. Sharing of information\n\nWe do not sell your personal information. We only share data with trusted service providers who help us operate, and only to the extent necessary.\n\n## 5. Data security\n\nWe apply reasonable technical and organisational safeguards to protect your data from unauthorised access, loss or misuse.\n\n## 6. Your rights\n\nYou may request access to, correction of, or deletion of your personal information at any time by contacting us at info@onewaynepal.com.\n\n## 7. Changes to this policy\n\nWe may update this policy from time to time. The latest version will always be published on this page."
+  },
+  "terms": {
+    "title": "Terms & Conditions",
+    "content": "## 1. Agreement to terms\n\nBy accessing or using the One Way Nepal website and services, you agree to be bound by these Terms & Conditions.\n\n## 2. Services\n\nWe provide branding, design, web and mobile development, and AI solutions. Scope, deliverables and timelines are agreed in writing per project before work begins.\n\n## 3. Client responsibilities\n\nYou agree to provide timely feedback, required materials and access necessary for us to deliver the agreed scope. Delays caused by missing inputs may affect timelines.\n\n## 4. Payments\n\nFees and payment schedules are defined in the project proposal. Invoices are due as agreed; overdue balances may pause active work.\n\n## 5. Intellectual property\n\nUpon full payment, final deliverables are transferred to you. We retain the right to showcase non-confidential work in our portfolio unless otherwise agreed.\n\n## 6. Liability\n\nOur total liability is limited to the fees paid for the specific project giving rise to a claim. We are not liable for indirect or consequential damages.\n\n## 7. Governing law\n\nThese terms are governed by the laws of Nepal."
+  },
+  "careers": [
+    {
+      "id": "career-1",
+      "title": "Senior Product Designer",
+      "location": "Kathmandu (Hybrid)",
+      "type": "Full-time",
+      "description": "Own end-to-end product design for web and mobile clients. You will lead discovery, wireframes, high-fidelity UI and design systems, working closely with developers."
+    },
+    {
+      "id": "career-2",
+      "title": "Full-stack Developer (Next.js)",
+      "location": "Remote",
+      "type": "Full-time",
+      "description": "Build fast, accessible web applications with Next.js, React and TypeScript. You will ship features from database to polished interface."
+    },
+    {
+      "id": "career-3",
+      "title": "AI Solutions Engineer",
+      "location": "Kathmandu (On-site)",
+      "type": "Full-time",
+      "description": "Design and deploy AI assistants, automation and analytics for client businesses. Strong grounding in prompt engineering and API integration required."
+    }
+  ],
+  "_backend": {
+    "backend": "json",
+    "configured": false
+  }
+}
