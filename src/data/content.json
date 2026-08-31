@@ -27,13 +27,6 @@
   },
   "careers": [
     {
-      "id": "career-1",
-      "title": "Senior Product Designer",
-      "location": "Kathmandu (Hybrid)",
-      "type": "Full-time",
-      "description": "Own end-to-end product design for web and mobile clients. You will lead discovery, wireframes, high-fidelity UI and design systems, working closely with developers."
-    },
-    {
       "id": "career-2",
       "title": "Full-stack Developer (Next.js)",
       "location": "Remote",
@@ -47,9 +40,5 @@
       "type": "Full-time",
       "description": "Design and deploy AI assistants, automation and analytics for client businesses. Strong grounding in prompt engineering and API integration required."
     }
-  ],
-  "_backend": {
-    "backend": "json",
-    "configured": false
-  }
+  ]
 }

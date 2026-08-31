@@ -254,12 +254,7 @@ export default function AdminPage() {
                 rows={12}
                 placeholder="Write your post here…"
               />
-              <p className="admin-hint">
-                Edit like a Word document — select text and use the toolbar to
-                make it <strong>bold</strong>, add headings, lists or links.
-                Sections marked <strong>Heading&nbsp;2</strong> automatically
-                appear in the article&apos;s table of contents.
-              </p>
+             
             </div>
             <div className="admin-form-actions">
               <button className="admin-btn admin-btn-primary" onClick={saveBlog} disabled={saving}>
@@ -354,10 +349,7 @@ export default function AdminPage() {
                 rows={5}
                 placeholder="Describe the role…"
               />
-              <p className="admin-hint">
-                Edit like a Word document — use the toolbar above to add bullet
-                points, links and headings. No special formatting codes needed.
-              </p>
+              
             </div>
             <div className="admin-form-actions">
               <button className="admin-btn admin-btn-primary" onClick={saveCareer} disabled={saving}>
@@ -432,11 +424,6 @@ export default function AdminPage() {
               rows={16}
               placeholder="Write the page content here…"
             />
-            <p className="admin-hint">
-              Edit like a Word document — select text and use the toolbar to
-              format it. Sections marked <strong>Heading&nbsp;2</strong>{" "}
-              automatically build the table of contents on the page.
-            </p>
           </div>
           <div className="admin-form-actions">
             <button
