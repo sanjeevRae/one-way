@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import ContactSlideOver from "@/components/ContactSlideOver";
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -300,6 +301,7 @@ function CountUp({
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const visibleFaqs = showAllFaqs ? faqs : faqs.slice(0, 7);
 
   useEffect(() => {
@@ -358,8 +360,8 @@ export default function Home() {
             <a href="#services">Services</a>
             <a href="#contact">Pricing</a>
           </div>
-          <button className="pill">Contact</button>
-          <button className="icon-button" aria-label="Contact Us">
+          <button className="pill" onClick={() => setContactOpen(true)}>Contact</button>
+          <button className="icon-button" aria-label="Contact Us" onClick={() => setContactOpen(true)}>
             <Menu size={18} />
           </button>
         </nav>
@@ -401,7 +403,7 @@ export default function Home() {
             <BriefcaseBusiness size={16} />
             <span>IT Solutions & Digital Services</span>
           </div>
-          <button>Get in Touch</button>
+          <button onClick={() => setContactOpen(true)}>Get in Touch</button>
         </div>
       </section>
 
@@ -517,13 +519,23 @@ export default function Home() {
             Ready to build something great <span>together today?</span>
           </h2>
           <div className="cta-actions" data-reveal="up">
-            <a href="#">Contact Us</a>
+            <a
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                setContactOpen(true);
+              }}
+            >
+              Contact Us
+            </a>
           </div>
         </div>
         <div className="crm-art" data-reveal="zoom">
           <Image src="/crm.png" alt="CRM abstract line illustration" fill sizes="50vw" />
         </div>
       </section>
+
+      <ContactSlideOver open={contactOpen} onClose={() => setContactOpen(false)} />
 
       <section className="revenue">
         <div className="revenue-title" data-reveal="left">
