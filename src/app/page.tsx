@@ -771,15 +771,11 @@ export default function Home() {
           <Link href="/blogs">Blogs</Link>
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
+          
         </div>
         <div className="footer-bottom">
           <p>© 2026 OneWayNepal. All rights reserved.</p>
-          <Link href="/admin" className="footer-admin">
-            Admin
-          </Link>
+          
         </div>
       </footer>
     </main>
