@@ -1817,15 +1817,6 @@ footer h3 {
     grid-template-columns: 1fr;
   }
 
-  /* On mobile, always show text first then image (regardless of alternating desktop layout) */
-  .work-copy {
-    order: -1;
-  }
-
-  .work-media {
-    order: 1;
-  }
-
   .service-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3581,7 +3572,7 @@ footer h3 {
 
   .contact-panel-head {
     padding: 60px 16px 0;
-    padding-top: max(60px, env(safe-area-inset-top));
+    padding-top: max(80px, env(safe-area-inset-top));
   }
 
   .contact-panel-body {
