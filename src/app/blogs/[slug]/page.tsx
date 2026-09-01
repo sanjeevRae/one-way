@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import ContentShell from "@/components/ContentShell";
 import { renderRich } from "@/components/ContentRenderer";
@@ -43,7 +42,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
         {blog.excerpt && <p className="article-excerpt">{blog.excerpt}</p>}
         {blog.image && (
           <div className="article-image">
-            <Image src={blog.image} alt={blog.title} fill sizes="100vw" />
+            <img src={blog.image} alt={blog.title} loading="lazy" />
           </div>
         )}
         <div className="article-with-toc">

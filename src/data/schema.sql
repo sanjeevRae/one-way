@@ -64,6 +64,22 @@ INSERT IGNORE INTO legal_pages (slug, title, content) VALUES
 -- ---------------------------------------------------------------------------
 -- Site settings (key/value bag) — optional, reserved for future use
 -- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- Admin users (login credentials for /admin)
+-- Passwords must be stored ONLY has scrypt hashes (see scripts/create-admin.js).
+-- SQL-injection proof: the application always uses parameterized queries on this table.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS admin_users (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  username      VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create an account (run scripts/create-admin.js, which hashes + inserts):
+--   node scripts/create-admin.js admin 'your-strong-password'
+
+-- ===========================================================================
 CREATE TABLE IF NOT EXISTS site_settings (
   `key`   VARCHAR(100) PRIMARY KEY,
   `value` TEXT
