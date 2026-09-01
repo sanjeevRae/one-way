@@ -363,7 +363,8 @@ button {
   color: #222;
 }
 
-.search-panel button {
+.search-panel button,
+.search-panel .search-panel-cta {
   height: 58px;
   border: 0;
   border-radius: 999px;
@@ -373,7 +374,17 @@ button {
   font-weight: 700;
 }
 
+.search-panel .search-panel-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
 .search-panel button:hover,
+.search-panel .search-panel-cta:hover,
 .cta-band a:hover,
 .process-head a:hover,
 .load-more:hover {
