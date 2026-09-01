@@ -2913,6 +2913,39 @@ footer h3 {
   gap: 8px;
 }
 
+.admin-login {
+  max-width: 420px;
+  margin: 48px auto;
+  padding: 32px;
+  border: 1px solid #e2e6e2;
+  border-radius: 14px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.admin-login h1 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: #11171a;
+}
+
+.admin-login p {
+  margin: 0 0 22px;
+  color: #5b6460;
+  font-size: 14px;
+}
+
+.admin-login form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.admin-login .admin-btn {
+  justify-content: center;
+  width: 100%;
+}
 .admin-btn {
   display: inline-flex;
   align-items: center;
