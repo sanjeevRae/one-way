@@ -768,14 +768,14 @@ export default function Home() {
         </div>
         <div data-reveal="up">
           <h3>Product</h3>
-          <a href="/#services">Features</a>
-          <a href="/#contact">Pricing</a>
-          <a href="/#work">Projects</a>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/#services`}>Features</a>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/#contact`}>Pricing</a>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/#work`}>Projects</a>
         </div>
         <div data-reveal="up">
           <h3>Company</h3>
-          <a href="/#about">About</a>
-          <a href="/#work">Work</a>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/#about`}>About</a>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/#work`}>Work</a>
           <Link href="/careers">Careers</Link>
         </div>
         <div data-reveal="up">
