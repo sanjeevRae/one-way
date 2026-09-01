@@ -403,7 +403,14 @@ export default function Home() {
             <BriefcaseBusiness size={16} />
             <span>IT Solutions & Digital Services</span>
           </div>
-          <button onClick={() => setContactOpen(true)}>Get in Touch</button>
+          <a
+            href="https://api.whatsapp.com/send/?phone=9779828626238&text&type=phone_number&app_absent=0"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="search-panel-cta"
+          >
+            Get in Touch
+          </a>
         </div>
       </section>
 
