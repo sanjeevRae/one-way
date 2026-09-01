@@ -1,23 +1,23 @@
-// Load .env so DATABASE_* / NEXT_PUBLIC_* are available at runtime.
-// Native to Node >= 20.6 — no dotenv dependency needed.
 try {
   if (typeof process.loadEnvFile === "function") {
-    process.loadEnvFile(); // loads ./.env if present; throws if missing
+    process.loadEnvFile();
   }
-} catch {
-  // .env not present — rely on environment vars set by the host (cPanel).
+} catch (error) {
+  console.error("Could not load .env:", error);
 }
 
 const { createServer } = require("http");
 const next = require("next");
 
-const port = parseInt(process.env.PORT, 10) || 3000;
-const hostname = "0.0.0.0";
+const port = parseInt(process.env.PORT || "3000", 10);
+
+console.log("Database:", process.env.DATABASE_NAME);
+console.log("Database user:", process.env.DATABASE_USER);
+console.log("Database password:", process.env.DATABASE_PASSWORD ? "SET" : "NOT SET");
 
 const app = next({
   dev: false,
-  hostname,
-  port,
+  hostname: "0.0.0.0",
 });
 
 const handle = app.getRequestHandler();
@@ -25,7 +25,7 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   createServer((req, res) => {
     handle(req, res);
-  }).listen(port, hostname, () => {
-    console.log(`Ready on http://${hostname}:${port}`);
+  }).listen(port, "0.0.0.0", () => {
+    console.log(`Ready on port ${port}`);
   });
 });
