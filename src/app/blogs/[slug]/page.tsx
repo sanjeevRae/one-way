@@ -7,6 +7,9 @@ import SmoothToc from "@/components/SmoothToc";
 import { getContentStore } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 
+// Server-render per request so admin edits in MySQL show live (CMS behavior).
+export const dynamic = "force-dynamic";
+
 interface BlogDetailProps {
   params: Promise<{ slug: string }>;
 }

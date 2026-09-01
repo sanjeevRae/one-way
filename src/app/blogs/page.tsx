@@ -4,6 +4,9 @@ import ContentShell from "@/components/ContentShell";
 import { getContentStore } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 
+// Server-render per request so admin edits in MySQL show live (CMS behavior).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blogs | One Way Nepal",
   description: "Ideas on design, development and AI from the One Way Nepal team.",

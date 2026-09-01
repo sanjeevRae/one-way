@@ -3,6 +3,9 @@ import ContentShell from "@/components/ContentShell";
 import { renderRich } from "@/components/ContentRenderer";
 import { getContentStore } from "@/lib/db";
 
+// Server-render per request so admin edits in MySQL show live (CMS behavior).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Careers | One Way Nepal",
   description: "Join the One Way Nepal team — branding, design, development and AI.",
