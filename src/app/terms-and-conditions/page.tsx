@@ -4,6 +4,9 @@ import { renderRich } from "@/components/ContentRenderer";
 import SmoothToc from "@/components/SmoothToc";
 import { getContentStore } from "@/lib/db";
 
+// Server-render per request so admin edits in MySQL show live (CMS behavior).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Terms & Conditions | One Way Nepal",
 };
