@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import MarkdownEditor from "@/components/MarkdownEditor";
@@ -65,7 +66,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/content")
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load content");
         return res.json() as Promise<SiteContent>;
@@ -99,7 +100,7 @@ export default function AdminPage() {
     setSaving(true);
     setStatus(null);
     try {
-      const res = await fetch("/api/content", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
@@ -459,9 +460,9 @@ export default function AdminPage() {
               ● Local JSON
             </span>
           )}
-          <a className="admin-btn" href="/">
+          <Link className="admin-btn" href="/">
             View site
-          </a>
+          </Link>
         </div>
       </header>
 
