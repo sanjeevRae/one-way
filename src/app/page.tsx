@@ -313,6 +313,7 @@ export default function Home() {
   const [workFilter, setWorkFilter] = useState("All");
   const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
   const [heroLogo, setHeroLogo] = useState("/logo-transparent.png");
+  const [heroImage, setHeroImage] = useState("/building.avif");
   const [faqs, setFaqs] = useState(() =>
     FALLBACK_FAQS.map((f, i) => ({ id: `f${i + 1}`, ...f }))
   );
@@ -353,6 +354,9 @@ export default function Home() {
         }
         if (typeof data.heroLogo === "string" && data.heroLogo.trim() !== "") {
           setHeroLogo(data.heroLogo);
+        }
+        if (typeof data.heroImage === "string" && data.heroImage.trim() !== "") {
+          setHeroImage(data.heroImage);
         }
       })
       .catch(() => {
@@ -397,7 +401,7 @@ export default function Home() {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [workFilter]);
 
   return (
     <main>
@@ -410,6 +414,7 @@ export default function Home() {
               width={132}
               height={44}
               priority
+              unoptimized
             />
             One Way Nepal
           </a>
@@ -438,10 +443,11 @@ export default function Home() {
 
         <div className="building" aria-hidden="true" data-reveal="up" style={{ "--reveal-delay": "0ms" } as React.CSSProperties}>
           <Image
-            src="/building.avif"
+            src={heroImage}
             alt=""
             fill
             priority
+            unoptimized
             sizes="(max-width: 820px) 95vw, 62vw"
           />
         </div>
@@ -700,6 +706,7 @@ export default function Home() {
                         alt={item.name}
                         width={84}
                         height={84}
+                        unoptimized
                       />
                     </span>
                     <div>
@@ -728,6 +735,7 @@ export default function Home() {
                         alt={item.name}
                         width={84}
                         height={84}
+                        unoptimized
                       />
                     </span>
                     <div>
