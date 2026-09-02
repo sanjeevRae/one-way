@@ -18,6 +18,7 @@ const EMPTY_CONTENT: SiteContent = {
   testimonials: [],
   faqs: [],
   heroLogo: "",
+  heroImage: "",
 };
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -109,6 +110,7 @@ export default function AdminPanel() {
   const [draftTestimonial, setDraftTestimonial] = useState<Testimonial | null>(null);
   const [draftFaq, setDraftFaq] = useState<Faq | null>(null);
   const [heroLogoDraft, setHeroLogoDraft] = useState("");
+  const [heroImageDraft, setHeroImageDraft] = useState("");
   const [uploading, setUploading] = useState(false);
   const [privacyDraft, setPrivacyDraft] = useState({ title: "", content: "" });
   const [termsDraft, setTermsDraft] = useState({ title: "", content: "" });
@@ -129,9 +131,11 @@ export default function AdminPanel() {
           testimonials: Array.isArray(clean.testimonials) ? clean.testimonials : [],
           faqs: Array.isArray(clean.faqs) ? clean.faqs : [],
           heroLogo: typeof clean.heroLogo === "string" ? clean.heroLogo : "",
+          heroImage: typeof clean.heroImage === "string" ? clean.heroImage : "",
         });
         if (_backend) setBackend(_backend.backend);
         setHeroLogoDraft(typeof clean.heroLogo === "string" ? clean.heroLogo : "");
+        setHeroImageDraft(typeof clean.heroImage === "string" ? clean.heroImage : "");
         setPrivacyDraft({
           title: d.privacyPolicy.title,
           content: d.privacyPolicy.content,
@@ -320,8 +324,24 @@ export default function AdminPanel() {
     }
   }
 
+  async function handleHeroImageUpload(file: File) {
+    setUploading(true);
+    setStatus(null);
+    try {
+      const url = await uploadImage(file);
+      setHeroImageDraft(url);
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Upload failed.",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
+
   function saveBranding() {
-    persist({ ...content, heroLogo: heroLogoDraft.trim() });
+    persist({ ...content, heroLogo: heroLogoDraft.trim(), heroImage: heroImageDraft.trim() });
   }
 
   function saveLegal(section: "privacy" | "terms") {
@@ -602,6 +622,7 @@ export default function AdminPanel() {
                     alt="Preview"
                     width={56}
                     height={56}
+                    unoptimized
                     style={{ borderRadius: "50%", objectFit: "cover" }}
                   />
                 )}
@@ -668,6 +689,7 @@ export default function AdminPanel() {
                       alt={t.name}
                       width={40}
                       height={40}
+                      unoptimized
                       style={{ borderRadius: "50%", objectFit: "cover" }}
                     />
                   )}
@@ -783,6 +805,7 @@ export default function AdminPanel() {
                 alt="Logo preview"
                 width={56}
                 height={56}
+                unoptimized
                 style={{ objectFit: "contain", background: "#fff", borderRadius: 8, padding: 4 }}
               />
               <label className="admin-btn" style={{ cursor: "pointer" }}>
@@ -818,6 +841,52 @@ export default function AdminPanel() {
             <p className="admin-hint">
               Leave empty to use the default logo (/logo-transparent.png). A transparent PNG/WebP around
               132×44 px looks best. Shown in the navbar at the top of every page.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Hero image (building)</label>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <Image
+                src={heroImageDraft || "/building.avif"}
+                alt="Hero image preview"
+                width={120}
+                height={80}
+                unoptimized
+                style={{ objectFit: "cover", background: "#fff", borderRadius: 8 }}
+              />
+              <label className="admin-btn" style={{ cursor: "pointer" }}>
+                <Upload size={14} /> {uploading ? "Uploading…" : "Upload image"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+                  style={{ display: "none" }}
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleHeroImageUpload(file);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              {heroImageDraft && (
+                <button
+                  className="admin-btn admin-btn-danger"
+                  onClick={() => setHeroImageDraft("")}
+                >
+                  Reset to default
+                </button>
+              )}
+            </div>
+            <input
+              className="admin-input"
+              style={{ marginTop: 10 }}
+              value={heroImageDraft}
+              onChange={(e) => setHeroImageDraft(e.target.value)}
+              placeholder="…or paste an image URL (/uploads/hero.webp or https://…)"
+            />
+            <p className="admin-hint">
+              Leave empty to use the default hero image (/building.avif). A wide image (roughly 4:3
+              ratio) looks best in the hero section.
             </p>
           </div>
           <div className="admin-form-actions">

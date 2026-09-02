@@ -48,6 +48,7 @@ export interface SiteContent {
   testimonials: Testimonial[];
   faqs: Faq[];
   heroLogo: string;
+  heroImage: string;
 }
 
 export const DEFAULT_CONTENT: SiteContent = {
@@ -58,6 +59,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   testimonials: [],
   faqs: [],
   heroLogo: "",
+  heroImage: "",
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -76,6 +78,7 @@ export async function readContent(): Promise<SiteContent> {
       testimonials: Array.isArray(parsed.testimonials) ? parsed.testimonials : [],
       faqs: Array.isArray(parsed.faqs) ? parsed.faqs : [],
       heroLogo: typeof parsed.heroLogo === "string" ? parsed.heroLogo : "",
+      heroImage: typeof parsed.heroImage === "string" ? parsed.heroImage : "",
     };
   } catch {
     return {
@@ -86,6 +89,7 @@ export async function readContent(): Promise<SiteContent> {
       testimonials: [],
       faqs: [],
       heroLogo: "",
+      heroImage: "",
     };
   }
 }

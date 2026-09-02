@@ -170,11 +170,16 @@ export async function getContentStore(): Promise<SiteContent> {
     );
 
     const [settingRows] = await pool.query(
-      "SELECT `key`, `value` FROM site_settings WHERE `key` = 'hero_logo'"
+      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image')"
     );
 
-    const heroLogo =
-      (settingRows as any[]).find((r) => r.key === "hero_logo")?.value ?? "";
+    const settingMap = new Map<string, string>();
+    for (const row of settingRows as any[]) {
+      settingMap.set(row.key, row.value ?? "");
+    }
+
+    const heroLogo = settingMap.get("hero_logo") ?? "";
+    const heroImage = settingMap.get("hero_image") ?? "";
 
     const legalMap = new Map<string, LegalPageData>();
 
@@ -196,6 +201,7 @@ export async function getContentStore(): Promise<SiteContent> {
       faqs: (faqRows as any[]).map(rowToFaq),
 
       heroLogo,
+      heroImage,
 
       privacyPolicy:
         legalMap.get("privacy") ?? {
@@ -408,17 +414,24 @@ export async function saveContentStore(
     }
 
     /* -------------------------------------------------------------- */
-    /* Site settings (hero logo)                                      */
+    /* Site settings (hero logo & hero image)                         */
     /* -------------------------------------------------------------- */
 
-    await conn.query(
-      `
+    const settings: Array<[string, string]> = [
+      ["hero_logo", content.heroLogo || ""],
+      ["hero_image", content.heroImage || ""],
+    ];
+
+    for (const [key, value] of settings) {
+      await conn.query(
+        `
       INSERT INTO site_settings (`+"`key`"+`, `+"`value`"+`)
-      VALUES ('hero_logo', ?)
+      VALUES (?, ?)
       ON DUPLICATE KEY UPDATE `+"`value`"+` = ?
       `,
-      [content.heroLogo || "", content.heroLogo || ""]
-    );
+        [key, value, value]
+      );
+    }
 
     await conn.commit();
   } catch (error) {
