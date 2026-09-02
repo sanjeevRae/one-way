@@ -26,11 +26,28 @@ export interface LegalPageData {
   content: string;
 }
 
+export interface Testimonial {
+  id: string;
+  quote: string;
+  name: string;
+  role: string;
+  image?: string;
+}
+
+export interface Faq {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export interface SiteContent {
   blogs: BlogPost[];
   privacyPolicy: LegalPageData;
   terms: LegalPageData;
   careers: Career[];
+  testimonials: Testimonial[];
+  faqs: Faq[];
+  heroLogo: string;
 }
 
 export const DEFAULT_CONTENT: SiteContent = {
@@ -38,6 +55,9 @@ export const DEFAULT_CONTENT: SiteContent = {
   privacyPolicy: { title: "Privacy Policy", content: "" },
   terms: { title: "Terms & Conditions", content: "" },
   careers: [],
+  testimonials: [],
+  faqs: [],
+  heroLogo: "",
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -53,6 +73,9 @@ export async function readContent(): Promise<SiteContent> {
       privacyPolicy: parsed.privacyPolicy ?? DEFAULT_CONTENT.privacyPolicy,
       terms: parsed.terms ?? DEFAULT_CONTENT.terms,
       careers: Array.isArray(parsed.careers) ? parsed.careers : [],
+      testimonials: Array.isArray(parsed.testimonials) ? parsed.testimonials : [],
+      faqs: Array.isArray(parsed.faqs) ? parsed.faqs : [],
+      heroLogo: typeof parsed.heroLogo === "string" ? parsed.heroLogo : "",
     };
   } catch {
     return {
@@ -60,6 +83,9 @@ export async function readContent(): Promise<SiteContent> {
       privacyPolicy: { ...DEFAULT_CONTENT.privacyPolicy },
       terms: { ...DEFAULT_CONTENT.terms },
       careers: [],
+      testimonials: [],
+      faqs: [],
+      heroLogo: "",
     };
   }
 }

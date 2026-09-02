@@ -8,8 +8,10 @@
 import type {
   BlogPost,
   Career,
+  Faq,
   LegalPageData,
   SiteContent,
+  Testimonial,
 } from "./content";
 
 /* ------------------------------------------------------------------ */
@@ -121,6 +123,24 @@ function rowToLegal(row: any): LegalPageData {
   };
 }
 
+function rowToTestimonial(row: any): Testimonial {
+  return {
+    id: row.id != null ? String(row.id) : "",
+    quote: row.quote ?? "",
+    name: row.name ?? "",
+    role: row.role ?? "",
+    image: row.image ?? undefined,
+  };
+}
+
+function rowToFaq(row: any): Faq {
+  return {
+    id: row.id != null ? String(row.id) : "",
+    question: row.question ?? "",
+    answer: row.answer ?? "",
+  };
+}
+
 /* ------------------------------------------------------------------ */
 /* Get content                                                        */
 /* ------------------------------------------------------------------ */
@@ -141,6 +161,21 @@ export async function getContentStore(): Promise<SiteContent> {
       "SELECT * FROM legal_pages WHERE slug IN ('privacy', 'terms')"
     );
 
+    const [testimonialRows] = await pool.query(
+      "SELECT * FROM testimonials ORDER BY id ASC"
+    );
+
+    const [faqRows] = await pool.query(
+      "SELECT * FROM faqs ORDER BY id ASC"
+    );
+
+    const [settingRows] = await pool.query(
+      "SELECT `key`, `value` FROM site_settings WHERE `key` = 'hero_logo'"
+    );
+
+    const heroLogo =
+      (settingRows as any[]).find((r) => r.key === "hero_logo")?.value ?? "";
+
     const legalMap = new Map<string, LegalPageData>();
 
     for (const row of legalRows as any[]) {
@@ -155,6 +190,12 @@ export async function getContentStore(): Promise<SiteContent> {
       blogs: (blogRows as any[]).map(rowToBlog),
 
       careers: (careerRows as any[]).map(rowToCareer),
+
+      testimonials: (testimonialRows as any[]).map(rowToTestimonial),
+
+      faqs: (faqRows as any[]).map(rowToFaq),
+
+      heroLogo,
 
       privacyPolicy:
         legalMap.get("privacy") ?? {
@@ -331,6 +372,53 @@ export async function saveContentStore(
         ]
       );
     }
+
+    /* -------------------------------------------------------------- */
+    /* Testimonials                                                   */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM testimonials");
+
+    for (const t of content.testimonials ?? []) {
+      await conn.query(
+        `
+        INSERT INTO testimonials
+        (quote, name, role, image)
+        VALUES (?, ?, ?, ?)
+        `,
+        [t.quote, t.name, t.role, t.image || null]
+      );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* FAQs                                                           */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM faqs");
+
+    for (const f of content.faqs ?? []) {
+      await conn.query(
+        `
+        INSERT INTO faqs
+        (question, answer)
+        VALUES (?, ?)
+        `,
+        [f.question, f.answer]
+      );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* Site settings (hero logo)                                      */
+    /* -------------------------------------------------------------- */
+
+    await conn.query(
+      `
+      INSERT INTO site_settings (`+"`key`"+`, `+"`value`"+`)
+      VALUES ('hero_logo', ?)
+      ON DUPLICATE KEY UPDATE `+"`value`"+` = ?
+      `,
+      [content.heroLogo || "", content.heroLogo || ""]
+    );
 
     await conn.commit();
   } catch (error) {

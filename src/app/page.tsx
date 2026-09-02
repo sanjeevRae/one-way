@@ -48,36 +48,36 @@ const works = [
   {
     title: "Branding Design",
     text: "Create distinctive brand identities with thoughtful visuals, memorable direction, and a consistent look across every touchpoint.",
-    image: "/brand.png",
+    image: "/brand.avif",
     tags: ["Branding", "Strategy", "Creative"],
   },
   {
     title: "Application Design",
     text: "Design intuitive and engaging mobile experiences that combine clean interfaces, smooth interactions, and user-focused functionality.",
-    image: "/app.png",
+    image: "/app.avif",
     tags: ["UI/UX", "Mobile", "Digital"],
   },
   {
     title: "AI-Powered Chatbots",
     text: "Build intelligent AI chatbots that answer questions, engage customers, capture leads, automate support, and deliver personalized experiences across your website, WhatsApp, and digital platforms.",
-    image: "/ai.png",
+    image: "/ai.avif",
     tags: ["AI", "Automation", "Support"],
   },
   {
     title: "Packaging Design",
     text: "Create eye-catching packaging that communicates your brand clearly while making your products stand out on the shelf and online.",
-    image: "/pack.png",
+    image: "/pack.avif",
     tags: ["Packaging", "Branding", "Creative"],
   },
   {
     title: "Website Design",
     text: "Build modern, responsive websites that combine strong visual design, intuitive experiences, and clear communication for your business.",
-    image: "/web2.png",
+    image: "/web2.avif",
     tags: ["Web", "Design", "Strategy"],
   },
 ];
 
-const faqs = [
+const FALLBACK_FAQS = [
   {
     question: "What services does One Way Nepal provide?",
     answer:
@@ -178,8 +178,9 @@ const processSteps = [
   },
 ];
 
-const testimonials = [
+const FALLBACK_TESTIMONIALS = [
   {
+    id: "t1",
     quote: "Love how you can take raw footage and turn it into a professional video with AI.",
     name: "Ram Sherpa",
     role: "Founder of",
@@ -187,6 +188,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t2",
     quote: "It makes video editing much, much easier.",
     name: "Kiran",
     role: "Founder of",
@@ -194,6 +196,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t3",
     quote: "Having spent years editing video, Capsule is absolutely mindblowing.",
     name: "xitiz shrestha",
     role: "Founder of",
@@ -201,6 +204,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t4",
     quote: "Would have saved a day in Adobe and looks better in less than half the time.",
     name: "Raj lama",
     role: "Founder of",
@@ -208,6 +212,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t5",
     quote: "Capsule checks all the boxes for creating engaging videos at scale.",
     name: "Shivam Shresthas",
     role: "Founder of",
@@ -215,6 +220,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t6",
     quote: "Capsule significantly improves the time it takes to create video.",
     name: "Bishnu Shrestha",
     role: "Founder of",
@@ -222,6 +228,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t7",
     quote: "There is Apple and then there's Capsule's UX and UI. This is world-class execution.",
     name: "Kiran Thapa",
     role: "Founder ",
@@ -229,6 +236,7 @@ const testimonials = [
       "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=160&q=80",
   },
   {
+    id: "t8",
     quote: "Great job making this tech accessible!",
     name: "Eslin rai",
     role: "Founder",
@@ -302,7 +310,58 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [workFilter, setWorkFilter] = useState("All");
+  const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
+  const [heroLogo, setHeroLogo] = useState("/logo-transparent.png");
+  const [faqs, setFaqs] = useState(() =>
+    FALLBACK_FAQS.map((f, i) => ({ id: `f${i + 1}`, ...f }))
+  );
   const visibleFaqs = showAllFaqs ? faqs : faqs.slice(0, 7);
+  const workCategories = ["All", ...Array.from(new Set(works.flatMap((w) => w.tags)))];
+  const filteredWorks =
+    workFilter === "All" ? works : works.filter((w) => w.tags.includes(workFilter));
+
+  // Load testimonials from the CMS (admin-editable). Falls back to the
+  // hardcoded list if the API is unreachable or empty.
+  useEffect(() => {
+    let active = true;
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data) return;
+        const list = data.testimonials;
+        if (Array.isArray(list) && list.length > 0) {
+          setTestimonials(
+            list.map((t: { id?: number | string; quote: string; name: string; role?: string; image?: string }, i: number) => ({
+              id: String(t.id ?? i),
+              quote: t.quote,
+              name: t.name,
+              role: t.role ?? "Founder",
+              image: t.image || FALLBACK_TESTIMONIALS[i % FALLBACK_TESTIMONIALS.length].image,
+            }))
+          );
+        }
+        const faqList = data.faqs;
+        if (Array.isArray(faqList) && faqList.length > 0) {
+          setFaqs(
+            faqList.map((f: { id?: number | string; question: string; answer: string }, i: number) => ({
+              id: String(f.id ?? i),
+              question: f.question,
+              answer: f.answer,
+            }))
+          );
+        }
+        if (typeof data.heroLogo === "string" && data.heroLogo.trim() !== "") {
+          setHeroLogo(data.heroLogo);
+        }
+      })
+      .catch(() => {
+        /* keep fallback testimonials */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const revealItems = document.querySelectorAll<HTMLElement>("[data-reveal]");
@@ -346,7 +405,7 @@ export default function Home() {
         <nav className="nav" data-reveal="up" style={{ "--reveal-delay": "520ms" } as React.CSSProperties}>
           <a className="brand" href="#">
             <Image
-              src="/logo-transparent.png"
+              src={heroLogo}
               alt="One Way Nepal"
               width={132}
               height={44}
@@ -369,7 +428,8 @@ export default function Home() {
         <div className="hero-copy">
           <h1 data-reveal="up" style={{ "--reveal-delay": "220ms" } as React.CSSProperties}>
             Modern technology 
-            <span>applied to your daily life</span>
+            <span>applied to your </span>
+            <span>daily life</span>
           </h1>
           <p data-reveal="up" style={{ "--reveal-delay": "340ms" } as React.CSSProperties}>
             We believe every new technology should amplify human creativity and expand knowledge. At One Way, we aim to bridge the gap between the complexities of technology and the practical challenges of everyday work.
@@ -482,42 +542,38 @@ export default function Home() {
             really proud of what we&apos;ve achieved together.
           </p>
         </div>
-        {works.map((work, i) => {
-          const copy = (
-            <div className="work-copy" data-reveal="up">
-              <h2 data-reveal="up">{work.title}</h2>
-              <p data-reveal="up">{work.text}</p>
-              <div className="tags" data-reveal="up">
-                {work.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
+        <div className="work-filters" data-reveal="up">
+          {workCategories.map((cat) => (
+            <button
+              key={cat}
+              className={`work-filter${workFilter === cat ? " active" : ""}`}
+              onClick={() => setWorkFilter(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        <div className="work-gallery">
+          {filteredWorks.map((work) => (
+            <article className="work-card" key={work.title} data-reveal="up">
+              <Image
+                src={work.image}
+                alt={work.title}
+                fill
+                sizes="(max-width: 820px) 100vw, 33vw"
+                className="work-card-img"
+                priority={workFilter === "All" && work === filteredWorks[0]}
+              />
+              <div className="work-card-overlay">
+                <span className="work-card-badge">{work.tags[0]}</span>
+                <div className="work-card-info">
+                  <h3>{work.title}</h3>
+                  <p>{work.text}</p>
+                </div>
               </div>
-            </div>
-          );
-          const media = (
-            <div className="work-media" data-reveal="up">
-              <Image src={work.image} alt={work.title} fill sizes="(max-width: 820px) 100vw, 52vw" />
-              <button aria-label={`Open ${work.title}`}>
-                <ArrowUpRight size={17} />
-              </button>
-            </div>
-          );
-          return (
-            <article className="work-row" key={work.title} data-reveal="up">
-              {i % 2 === 0 ? (
-                <>
-                  {copy}
-                  {media}
-                </>
-              ) : (
-                <>
-                  {media}
-                  {copy}
-                </>
-              )}
             </article>
-          );
-        })}
+          ))}
+        </div>
       </section>
 
       <section className="cta-band" id="contact">
@@ -544,7 +600,7 @@ export default function Home() {
 
       <ContactSlideOver open={contactOpen} onClose={() => setContactOpen(false)} />
 
-      <section className="revenue">
+      {/* <section className="revenue">
         <div className="revenue-title" data-reveal="left">
           <h2 data-reveal="up">
             <span>Move</span>
@@ -590,7 +646,7 @@ export default function Home() {
             </p>
           </article>
         </div>
-      </section>
+      </section> */}
 
       <section className="process">
         <div className="process-head">
@@ -633,7 +689,7 @@ export default function Home() {
         </div>
         <div className="quote-marquee marquee-forward" data-reveal="left">
           <div className="quote-track">
-            {[...testimonials.slice(0, 4), ...testimonials.slice(0, 4)].map(
+            {[...testimonials.slice(0, Math.ceil(testimonials.length / 2)), ...testimonials.slice(0, Math.ceil(testimonials.length / 2))].map(
               (item, index) => (
                 <article key={`top-${index}`}>
                   <p>&ldquo;{item.quote}&rdquo;</p>
@@ -658,7 +714,10 @@ export default function Home() {
         </div>
         <div className="quote-marquee marquee-reverse" data-reveal="right">
           <div className="quote-track">
-            {[...testimonials.slice(4), ...testimonials.slice(4)].map(
+            {(() => {
+              const bottom = testimonials.slice(Math.ceil(testimonials.length / 2));
+              const items = bottom.length > 0 ? bottom : testimonials.slice(0, Math.ceil(testimonials.length / 2));
+              return [...items, ...items].map(
               (item, index) => (
                 <article key={`bottom-${index}`}>
                   <p>&ldquo;{item.quote}&rdquo;</p>
@@ -677,8 +736,9 @@ export default function Home() {
                     </div>
                   </div>
                 </article>
-              ),
-            )}
+              )
+              );
+            })()}
           </div>
         </div>
       </section>
@@ -793,7 +853,7 @@ export default function Home() {
           
         </div>
         <div className="footer-bottom">
-          <p>© 2026 OneWayNepal. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} OneWayNepal. All rights reserved.</p>
           
         </div>
       </footer>
