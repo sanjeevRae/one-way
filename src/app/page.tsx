@@ -544,8 +544,7 @@ export default function Home() {
         <div className="work-head" data-reveal="left">
           <h2 data-reveal="up">Selected work!</h2>
           <p data-reveal="up">
-            We&apos;ve loved working with many fantastic companies, and are
-            really proud of what we&apos;ve achieved together.
+            A selection of work we’re proud to have created with incredible companies.
           </p>
         </div>
         <div className="work-filters" data-reveal="up">
