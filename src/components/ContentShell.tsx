@@ -22,7 +22,7 @@ export default function ContentShell({ children }: ContentShellProps) {
       <main className="content-main">{children}</main>
 
       <footer className="content-footer">
-        <p>© 2026 OneWayNepal. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} OneWayNepal. All rights reserved.</p>
         <p>
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
