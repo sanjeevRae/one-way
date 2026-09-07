@@ -151,6 +151,98 @@ SELECT * FROM (
 ) AS seed
 WHERE NOT EXISTS (SELECT 1 FROM faqs);
 
+-- ---------------------------------------------------------------------------
+-- Intro stats (homepage "We are…" section counters)
+-- Managed from /admin → Intro. The kicker and heading texts are stored in
+-- site_settings under the keys 'intro_kicker' and 'intro_heading'.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS intro_stats (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  stat_value INT NOT NULL DEFAULT 0,
+  label      VARCHAR(150) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed the original four stats (only if the table is empty).
+INSERT INTO intro_stats (stat_value, label, sort_order)
+SELECT * FROM (
+  SELECT 100 AS stat_value, 'Digital Ideas' AS label, 0 AS sort_order
+  UNION ALL SELECT 6,  'Core Services', 1
+  UNION ALL SELECT 52, 'Solutions', 2
+  UNION ALL SELECT 14, 'Industries', 3
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM intro_stats);
+
+-- ---------------------------------------------------------------------------
+-- Services (homepage "Our Services" grid)
+-- Managed from /admin → Services. Kicker/heading/"more" count live in
+-- site_settings under 'services_kicker', 'services_heading', 'services_more'.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS services (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  label      VARCHAR(200) NOT NULL,
+  icon       VARCHAR(60)  NOT NULL DEFAULT 'Code2',
+  sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO services (label, icon, sort_order)
+SELECT * FROM (
+  SELECT 'Web Development' AS label, 'Code2' AS icon, 0 AS sort_order
+  UNION ALL SELECT 'Mobile App Development', 'Smartphone', 1
+  UNION ALL SELECT 'AI Solutions', 'Bot', 2
+  UNION ALL SELECT 'UI/UX Design', 'PenTool', 3
+  UNION ALL SELECT 'Graphic Design', 'Palette', 4
+  UNION ALL SELECT 'Branding', 'Gem', 5
+  UNION ALL SELECT 'Digital Analytics', 'Megaphone', 6
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM services);
+
+-- ---------------------------------------------------------------------------
+-- Works (homepage "Selected work!" gallery)
+-- Managed from /admin → Work. Heading/subtext live in site_settings under
+-- 'work_heading' and 'work_subtext'. Tags are comma-separated.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS works (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  title      VARCHAR(200) NOT NULL,
+  text       TEXT NOT NULL,
+  image      VARCHAR(500) DEFAULT NULL,
+  tags       VARCHAR(500) NOT NULL DEFAULT '',
+  sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO works (title, `text`, image, tags, sort_order)
+SELECT * FROM (
+  SELECT 'Branding Design' AS title, 'Create distinctive brand identities with thoughtful visuals, memorable direction, and a consistent look across every touchpoint.' AS `text`, '/brand.avif' AS image, 'Branding,Strategy,Creative' AS tags, 0 AS sort_order
+  UNION ALL SELECT 'Application Design', 'Design intuitive and engaging mobile experiences that combine clean interfaces, smooth interactions, and user-focused functionality.', '/app.avif', 'UI/UX,Mobile,Digital', 1
+  UNION ALL SELECT 'AI-Powered Chatbots', 'Build intelligent AI chatbots that answer questions, engage customers, capture leads, automate support, and deliver personalized experiences across your website, WhatsApp, and digital platforms.', '/ai.avif', 'AI,Automation,Support', 2
+  UNION ALL SELECT 'Packaging Design', 'Create eye-catching packaging that communicates your brand clearly while making your products stand out on the shelf and online.', '/pack.avif', 'Packaging,Branding,Creative', 3
+  UNION ALL SELECT 'Website Design', 'Build modern, responsive websites that combine strong visual design, intuitive experiences, and clear communication for your business.', '/web2.avif', 'Web,Design,Strategy', 4
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM works);
+
+-- ---------------------------------------------------------------------------
+-- Pricing (interactive package selector on /pricing)
+-- Managed from /admin → Pricing. Each package has three plans
+-- (ECONOMIC/BUDGET/STANDARD); plan features are stored as JSON.
+-- When pricing_packages is empty the site falls back to built-in defaults.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pricing_packages (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(200) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS pricing_plans (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  package_id INT NOT NULL,
+  name       VARCHAR(60) NOT NULL,
+  price      VARCHAR(100) NOT NULL DEFAULT '',
+  features   TEXT,
+  sort_order INT NOT NULL DEFAULT 0,
+  INDEX pricing_plans_package_idx (package_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Useful queries -------------------------------------------------------------
 -- Show all blogs:
 --   SELECT id, slug, title, date FROM blogs ORDER BY date DESC;

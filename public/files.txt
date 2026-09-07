@@ -1,0 +1,11 @@
+1. email - zoho 5 free
+contacts us redirect 
+superbase database & auth
+
+2. superbase postgressql
+500MB free 
+
+
+3. chatbot groq gpt-oss NLP (1,000 requests per day/ pay as you go)
+	
+4. 

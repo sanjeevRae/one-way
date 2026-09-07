@@ -6,8 +6,12 @@ import { useEffect, useState } from "react";
 import { Pencil, Plus, Save, Trash2, X, Upload } from "lucide-react";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import type { BlogPost, Career, Faq, SiteContent, Testimonial } from "@/lib/content";
+import type { IntroStat } from "@/lib/intro";
+import type { ServiceItem, WorkItem } from "@/lib/sections";
+import { SERVICE_ICONS } from "@/lib/sections";
+import type { PricingPackage } from "@/lib/pricing";
 
-type Tab = "blogs" | "privacy" | "terms" | "careers" | "testimonials" | "faqs" | "branding";
+type Tab = "blogs" | "privacy" | "terms" | "careers" | "testimonials" | "faqs" | "branding" | "intro" | "services" | "work" | "pricing";
 type Status = { kind: "success" | "error"; message: string } | null;
 
 const EMPTY_CONTENT: SiteContent = {
@@ -19,6 +23,17 @@ const EMPTY_CONTENT: SiteContent = {
   faqs: [],
   heroLogo: "",
   heroImage: "",
+  introKicker: "",
+  introHeading: "",
+  introStats: [],
+  servicesKicker: "",
+  servicesHeading: "",
+  servicesMore: 4,
+  services: [],
+  workHeading: "",
+  workSubtext: "",
+  works: [],
+  pricingPackages: [],
 };
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -28,6 +43,10 @@ const TABS: Array<{ key: Tab; label: string }> = [
   { key: "careers", label: "Careers" },
   { key: "testimonials", label: "Testimonials" },
   { key: "faqs", label: "FAQs" },
+  { key: "intro", label: "Intro" },
+  { key: "services", label: "Services" },
+  { key: "work", label: "Work" },
+  { key: "pricing", label: "Pricing" },
   { key: "branding", label: "Branding" },
 ];
 
@@ -111,6 +130,17 @@ export default function AdminPanel() {
   const [draftFaq, setDraftFaq] = useState<Faq | null>(null);
   const [heroLogoDraft, setHeroLogoDraft] = useState("");
   const [heroImageDraft, setHeroImageDraft] = useState("");
+  const [introKickerDraft, setIntroKickerDraft] = useState("");
+  const [introHeadingDraft, setIntroHeadingDraft] = useState("");
+  const [introStatsDraft, setIntroStatsDraft] = useState<IntroStat[]>([]);
+  const [servicesKickerDraft, setServicesKickerDraft] = useState("");
+  const [servicesHeadingDraft, setServicesHeadingDraft] = useState("");
+  const [servicesMoreDraft, setServicesMoreDraft] = useState(4);
+  const [servicesDraft, setServicesDraft] = useState<ServiceItem[]>([]);
+  const [workHeadingDraft, setWorkHeadingDraft] = useState("");
+  const [workSubtextDraft, setWorkSubtextDraft] = useState("");
+  const [worksDraft, setWorksDraft] = useState<WorkItem[]>([]);
+  const [pricingDraft, setPricingDraft] = useState<PricingPackage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [privacyDraft, setPrivacyDraft] = useState({ title: "", content: "" });
   const [termsDraft, setTermsDraft] = useState({ title: "", content: "" });
@@ -132,10 +162,77 @@ export default function AdminPanel() {
           faqs: Array.isArray(clean.faqs) ? clean.faqs : [],
           heroLogo: typeof clean.heroLogo === "string" ? clean.heroLogo : "",
           heroImage: typeof clean.heroImage === "string" ? clean.heroImage : "",
+          introKicker: typeof clean.introKicker === "string" ? clean.introKicker : "",
+          introHeading: typeof clean.introHeading === "string" ? clean.introHeading : "",
+          introStats: Array.isArray(clean.introStats) ? clean.introStats : [],
+          servicesKicker: typeof clean.servicesKicker === "string" ? clean.servicesKicker : "",
+          servicesHeading: typeof clean.servicesHeading === "string" ? clean.servicesHeading : "",
+          servicesMore: Number.isFinite(Number(clean.servicesMore)) ? Number(clean.servicesMore) : 4,
+          services: Array.isArray(clean.services) ? clean.services : [],
+          workHeading: typeof clean.workHeading === "string" ? clean.workHeading : "",
+          workSubtext: typeof clean.workSubtext === "string" ? clean.workSubtext : "",
+          works: Array.isArray(clean.works) ? clean.works : [],
+          pricingPackages: Array.isArray(clean.pricingPackages) ? clean.pricingPackages : [],
         });
         if (_backend) setBackend(_backend.backend);
         setHeroLogoDraft(typeof clean.heroLogo === "string" ? clean.heroLogo : "");
         setHeroImageDraft(typeof clean.heroImage === "string" ? clean.heroImage : "");
+        setIntroKickerDraft(typeof clean.introKicker === "string" ? clean.introKicker : "");
+        setIntroHeadingDraft(typeof clean.introHeading === "string" ? clean.introHeading : "");
+        setIntroStatsDraft(
+          Array.isArray(clean.introStats)
+            ? clean.introStats.map((s, i) => ({
+                id: typeof s.id === "string" ? s.id : `s${i + 1}`,
+                value: Number(s.value) || 0,
+                label: String(s.label ?? ""),
+              }))
+            : []
+        );
+        setServicesKickerDraft(typeof clean.servicesKicker === "string" ? clean.servicesKicker : "");
+        setServicesHeadingDraft(typeof clean.servicesHeading === "string" ? clean.servicesHeading : "");
+        setServicesMoreDraft(Number.isFinite(Number(clean.servicesMore)) ? Number(clean.servicesMore) : 4);
+        setServicesDraft(
+          Array.isArray(clean.services)
+            ? clean.services.map((s, i) => ({
+                id: typeof s.id === "string" ? s.id : `srv${i + 1}`,
+                label: String(s.label ?? ""),
+                icon: String(s.icon ?? "Code2"),
+              }))
+            : []
+        );
+        setWorkHeadingDraft(typeof clean.workHeading === "string" ? clean.workHeading : "");
+        setWorkSubtextDraft(typeof clean.workSubtext === "string" ? clean.workSubtext : "");
+        setWorksDraft(
+          Array.isArray(clean.works)
+            ? clean.works.map((w, i) => ({
+                id: typeof w.id === "string" ? w.id : `w${i + 1}`,
+                title: String(w.title ?? ""),
+                text: String(w.text ?? ""),
+                image: String(w.image ?? ""),
+                tags: Array.isArray(w.tags) ? w.tags.map(String) : [],
+              }))
+            : []
+        );
+        setPricingDraft(
+          Array.isArray(clean.pricingPackages)
+            ? clean.pricingPackages.map((p, i) => ({
+                id: typeof p.id === "string" ? p.id : `pkg${i + 1}`,
+                name: String(p.name ?? ""),
+                plans: Array.isArray(p.plans)
+                  ? p.plans.map((pl) => ({
+                      name: String(pl.name ?? ""),
+                      price: String(pl.price ?? ""),
+                      features: Array.isArray(pl.features)
+                        ? pl.features.map((f: { label: string; value: string }) => ({
+                            label: String(f.label ?? ""),
+                            value: String(f.value ?? ""),
+                          }))
+                        : [],
+                    }))
+                  : [],
+              }))
+            : []
+        );
         setPrivacyDraft({
           title: d.privacyPolicy.title,
           content: d.privacyPolicy.content,
@@ -342,6 +439,236 @@ export default function AdminPanel() {
 
   function saveBranding() {
     persist({ ...content, heroLogo: heroLogoDraft.trim(), heroImage: heroImageDraft.trim() });
+  }
+
+  function saveIntro() {
+    persist({
+      ...content,
+      introKicker: introKickerDraft.trim(),
+      introHeading: introHeadingDraft.trim(),
+      introStats: introStatsDraft.map((s) => ({
+        id: s.id,
+        value: Number(s.value) || 0,
+        label: s.label.trim(),
+      })),
+    });
+  }
+
+  function updateIntroStat(id: string, patch: Partial<IntroStat>) {
+    setIntroStatsDraft((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
+    );
+  }
+
+  function addIntroStat() {
+    setIntroStatsDraft((prev) => [
+      ...prev,
+      { id: `s${Date.now()}`, value: 0, label: "" },
+    ]);
+  }
+
+  function removeIntroStat(id: string) {
+    setIntroStatsDraft((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  /* ---------------- Services ---------------- */
+
+  function saveServices() {
+    persist({
+      ...content,
+      servicesKicker: servicesKickerDraft.trim(),
+      servicesHeading: servicesHeadingDraft.trim(),
+      servicesMore: Number(servicesMoreDraft) || 0,
+      services: servicesDraft.map((s) => ({
+        id: s.id,
+        label: s.label.trim(),
+        icon: s.icon,
+      })),
+    });
+  }
+
+  function updateService(id: string, patch: Partial<ServiceItem>) {
+    setServicesDraft((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  }
+
+  function addService() {
+    setServicesDraft((prev) => [
+      ...prev,
+      { id: `srv${Date.now()}`, label: "", icon: "Code2" },
+    ]);
+  }
+
+  function removeService(id: string) {
+    setServicesDraft((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  /* ---------------- Work ---------------- */
+
+  function saveWork() {
+    persist({
+      ...content,
+      workHeading: workHeadingDraft.trim(),
+      workSubtext: workSubtextDraft.trim(),
+      works: worksDraft.map((w) => ({
+        id: w.id,
+        title: w.title.trim(),
+        text: w.text.trim(),
+        image: w.image.trim(),
+        tags: w.tags.map((t) => t.trim()).filter(Boolean),
+      })),
+    });
+  }
+
+  function updateWork(id: string, patch: Partial<WorkItem>) {
+    setWorksDraft((prev) => prev.map((w) => (w.id === id ? { ...w, ...patch } : w)));
+  }
+
+  function addWork() {
+    setWorksDraft((prev) => [
+      ...prev,
+      { id: `w${Date.now()}`, title: "", text: "", image: "", tags: [] },
+    ]);
+  }
+
+  function removeWork(id: string) {
+    setWorksDraft((prev) => prev.filter((w) => w.id !== id));
+  }
+
+  async function handleWorkImageUpload(id: string, file: File) {
+    setUploading(true);
+    setStatus(null);
+    try {
+      const url = await uploadImage(file);
+      updateWork(id, { image: url });
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Upload failed.",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  /* ---------------- Pricing ---------------- */
+
+  function savePricing() {
+    persist({
+      ...content,
+      pricingPackages: pricingDraft.map((p) => ({
+        id: p.id,
+        name: p.name.trim(),
+        plans: p.plans.map((pl) => ({
+          name: pl.name.trim(),
+          price: pl.price.trim(),
+          features: pl.features.map((f) => ({
+            label: f.label.trim(),
+            value: f.value,
+          })),
+        })),
+      })),
+    });
+  }
+
+  function updatePricingPackage(id: string, patch: Partial<PricingPackage>) {
+    setPricingDraft((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  }
+
+  function addPricingPackage() {
+    setPricingDraft((prev) => [
+      ...prev,
+      {
+        id: `pkg${Date.now()}`,
+        name: "",
+        plans: [
+          { name: "ECONOMIC", price: "", features: [] },
+          { name: "BUDGET", price: "", features: [] },
+          { name: "STANDARD", price: "", features: [] },
+        ],
+      },
+    ]);
+  }
+
+  function removePricingPackage(id: string) {
+    setPricingDraft((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  function updatePricingPlan(
+    pkgId: string,
+    planIndex: number,
+    patch: Partial<PricingPackage["plans"][number]>
+  ) {
+    setPricingDraft((prev) =>
+      prev.map((p) =>
+        p.id === pkgId
+          ? {
+              ...p,
+              plans: p.plans.map((pl, i) => (i === planIndex ? { ...pl, ...patch } : pl)),
+            }
+          : p
+      )
+    );
+  }
+
+  function updatePricingFeature(
+    pkgId: string,
+    planIndex: number,
+    featureIndex: number,
+    patch: Partial<{ label: string; value: string }>
+  ) {
+    setPricingDraft((prev) =>
+      prev.map((p) =>
+        p.id === pkgId
+          ? {
+              ...p,
+              plans: p.plans.map((pl, i) =>
+                i === planIndex
+                  ? {
+                      ...pl,
+                      features: pl.features.map((f, fi) =>
+                        fi === featureIndex ? { ...f, ...patch } : f
+                      ),
+                    }
+                  : pl
+              ),
+            }
+          : p
+      )
+    );
+  }
+
+  function addPricingFeature(pkgId: string, planIndex: number) {
+    setPricingDraft((prev) =>
+      prev.map((p) =>
+        p.id === pkgId
+          ? {
+              ...p,
+              plans: p.plans.map((pl, i) =>
+                i === planIndex
+                  ? { ...pl, features: [...pl.features, { label: "", value: "" }] }
+                  : pl
+              ),
+            }
+          : p
+      )
+    );
+  }
+
+  function removePricingFeature(pkgId: string, planIndex: number, featureIndex: number) {
+    setPricingDraft((prev) =>
+      prev.map((p) =>
+        p.id === pkgId
+          ? {
+              ...p,
+              plans: p.plans.map((pl, i) =>
+                i === planIndex
+                  ? { ...pl, features: pl.features.filter((_, fi) => fi !== featureIndex) }
+                  : pl
+              ),
+            }
+          : p
+      )
+    );
   }
 
   function saveLegal(section: "privacy" | "terms") {
@@ -790,6 +1117,436 @@ export default function AdminPanel() {
   }
 /* ---------------- Render: Branding ---------------- */
 
+  function renderIntro() {
+    return (
+      <div className="admin-card">
+        <div className="admin-card-head">
+          <h2>Intro section (We are…)</h2>
+        </div>
+        <div className="admin-form">
+          <div className="admin-field">
+            <label>Kicker (small text above the heading)</label>
+            <input
+              className="admin-input"
+              value={introKickerDraft}
+              onChange={(e) => setIntroKickerDraft(e.target.value)}
+              placeholder="We are…"
+            />
+          </div>
+          <div className="admin-field">
+            <label>Heading (the conviction statement)</label>
+            <textarea
+              className="admin-input"
+              rows={5}
+              value={introHeadingDraft}
+              onChange={(e) => setIntroHeadingDraft(e.target.value)}
+              placeholder="A company with a simple conviction…"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label>Stats (counters)</label>
+            {introStatsDraft.length === 0 && (
+              <p className="admin-hint">No stats yet — add one below.</p>
+            )}
+            {introStatsDraft.map((stat) => (
+              <div
+                key={stat.id}
+                style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}
+              >
+                <input
+                  className="admin-input"
+                  type="number"
+                  min={0}
+                  style={{ width: 110 }}
+                  value={stat.value}
+                  onChange={(e) => updateIntroStat(stat.id, { value: Number(e.target.value) })}
+                  aria-label="Stat value"
+                />
+                <input
+                  className="admin-input"
+                  value={stat.label}
+                  onChange={(e) => updateIntroStat(stat.id, { label: e.target.value })}
+                  placeholder="Label (e.g. Digital Ideas)"
+                />
+                <button
+                  className="admin-btn admin-btn-danger"
+                  onClick={() => removeIntroStat(stat.id)}
+                  aria-label={`Remove stat ${stat.label || ""}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+            <button className="admin-btn" onClick={addIntroStat}>
+              <Plus size={14} /> Add stat
+            </button>
+          </div>
+
+          <div className="admin-form-actions">
+            <button
+              className="admin-btn admin-btn-primary"
+              onClick={saveIntro}
+              disabled={saving}
+            >
+              <Save size={14} /> {saving ? "Saving…" : "Save intro"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderServices() {
+    return (
+      <div className="admin-card">
+        <div className="admin-card-head">
+          <h2>Services section</h2>
+        </div>
+        <div className="admin-form">
+          <div className="admin-field">
+            <label>Kicker (small text)</label>
+            <input
+              className="admin-input"
+              value={servicesKickerDraft}
+              onChange={(e) => setServicesKickerDraft(e.target.value)}
+              placeholder="Our Services"
+            />
+          </div>
+          <div className="admin-field">
+            <label>Heading</label>
+            <input
+              className="admin-input"
+              value={servicesHeadingDraft}
+              onChange={(e) => setServicesHeadingDraft(e.target.value)}
+              placeholder="We aim to provide solutions…"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label>Service items</label>
+            {servicesDraft.map((service) => (
+              <div
+                key={service.id}
+                style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}
+              >
+                <select
+                  className="admin-input"
+                  style={{ width: 150 }}
+                  value={service.icon}
+                  onChange={(e) => updateService(service.id, { icon: e.target.value })}
+                  aria-label="Icon"
+                >
+                  {SERVICE_ICONS.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className="admin-input"
+                  value={service.label}
+                  onChange={(e) => updateService(service.id, { label: e.target.value })}
+                  placeholder="Service name (e.g. Web Development)"
+                />
+                <button
+                  className="admin-btn admin-btn-danger"
+                  onClick={() => removeService(service.id)}
+                  aria-label={`Remove service ${service.label || ""}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+            <button className="admin-btn" onClick={addService}>
+              <Plus size={14} /> Add service
+            </button>
+          </div>
+
+          <div className="admin-field">
+            <label>"+N More" card</label>
+            <input
+              className="admin-input"
+              type="number"
+              min={0}
+              style={{ width: 110 }}
+              value={servicesMoreDraft}
+              onChange={(e) => setServicesMoreDraft(Number(e.target.value))}
+            />
+            <p className="admin-hint">Set 0 to hide the "+N More" card.</p>
+          </div>
+
+          <div className="admin-form-actions">
+            <button
+              className="admin-btn admin-btn-primary"
+              onClick={saveServices}
+              disabled={saving}
+            >
+              <Save size={14} /> {saving ? "Saving…" : "Save services"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderWork() {
+    return (
+      <div className="admin-card">
+        <div className="admin-card-head">
+          <h2>Selected work gallery</h2>
+        </div>
+        <div className="admin-form">
+          <div className="admin-field">
+            <label>Heading</label>
+            <input
+              className="admin-input"
+              value={workHeadingDraft}
+              onChange={(e) => setWorkHeadingDraft(e.target.value)}
+              placeholder="Selected work!"
+            />
+          </div>
+          <div className="admin-field">
+            <label>Subtext (below the heading)</label>
+            <textarea
+              className="admin-input"
+              rows={2}
+              value={workSubtextDraft}
+              onChange={(e) => setWorkSubtextDraft(e.target.value)}
+              placeholder="A selection of work…"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label>Work items (filters build from tags automatically)</label>
+            {worksDraft.map((work) => (
+              <div
+                key={work.id}
+                style={{
+                  border: "1px solid #e2e6e2",
+                  borderRadius: 10,
+                  padding: 14,
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                  <input
+                    className="admin-input"
+                    value={work.title}
+                    onChange={(e) => updateWork(work.id, { title: e.target.value })}
+                    placeholder="Project title"
+                  />
+                  <button
+                    className="admin-btn admin-btn-danger"
+                    onClick={() => removeWork(work.id)}
+                    aria-label={`Remove work ${work.title || ""}`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+                <textarea
+                  className="admin-input"
+                  rows={2}
+                  value={work.text}
+                  onChange={(e) => updateWork(work.id, { text: e.target.value })}
+                  placeholder="Short description shown on hover"
+                  style={{ marginBottom: 8 }}
+                />
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
+                  {work.image && (
+                    <Image
+                      src={work.image}
+                      alt={work.title || "Work preview"}
+                      width={72}
+                      height={48}
+                      unoptimized
+                      style={{ objectFit: "cover", borderRadius: 6 }}
+                    />
+                  )}
+                  <label className="admin-btn" style={{ cursor: "pointer" }}>
+                    <Upload size={14} /> {uploading ? "Uploading…" : "Upload image"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+                      style={{ display: "none" }}
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleWorkImageUpload(work.id, file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+                <input
+                  className="admin-input"
+                  value={work.image}
+                  onChange={(e) => updateWork(work.id, { image: e.target.value })}
+                  placeholder="…or paste an image URL (/brand.avif or https://…)"
+                  style={{ marginBottom: 8 }}
+                />
+                <input
+                  className="admin-input"
+                  value={work.tags.join(", ")}
+                  onChange={(e) =>
+                    updateWork(work.id, {
+                      tags: e.target.value.split(",").map((t) => t.trim()),
+                    })
+                  }
+                  placeholder="Tags, comma-separated (e.g. Branding, Strategy, Creative)"
+                />
+              </div>
+            ))}
+            <button className="admin-btn" onClick={addWork}>
+              <Plus size={14} /> Add work
+            </button>
+          </div>
+
+          <div className="admin-form-actions">
+            <button
+              className="admin-btn admin-btn-primary"
+              onClick={saveWork}
+              disabled={saving}
+            >
+              <Save size={14} /> {saving ? "Saving…" : "Save work"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderPricing() {
+    return (
+      <div className="admin-card">
+        <div className="admin-card-head">
+          <h2>Pricing packages (interactive selector)</h2>
+        </div>
+        <div className="admin-form">
+          <p className="admin-hint">
+            Each package is shown in the left sidebar of /pricing and contains three
+            plans. Use ✅ / ❌ as feature values to render check / cross icons.
+          </p>
+
+          {pricingDraft.map((pkg) => (
+            <div
+              key={pkg.id}
+              style={{
+                border: "1px solid #e2e6e2",
+                borderRadius: 10,
+                padding: 14,
+                marginBottom: 14,
+              }}
+            >
+              <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
+                <input
+                  className="admin-input"
+                  value={pkg.name}
+                  onChange={(e) => updatePricingPackage(pkg.id, { name: e.target.value })}
+                  placeholder="Package name (e.g. BUSINESS PACKAGE)"
+                  style={{ fontWeight: 700, textTransform: "uppercase" }}
+                />
+                <button
+                  className="admin-btn admin-btn-danger"
+                  onClick={() => removePricingPackage(pkg.id)}
+                  aria-label={`Remove package ${pkg.name || ""}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+
+              {pkg.plans.map((plan, planIndex) => (
+                <div
+                  key={planIndex}
+                  style={{
+                    borderTop: "1px solid #f0f3f1",
+                    paddingTop: 12,
+                    marginBottom: 12,
+                  }}
+                >
+                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                    <input
+                      className="admin-input"
+                      style={{ width: 150 }}
+                      value={plan.name}
+                      onChange={(e) =>
+                        updatePricingPlan(pkg.id, planIndex, { name: e.target.value })
+                      }
+                      placeholder="Plan name"
+                    />
+                    <input
+                      className="admin-input"
+                      value={plan.price}
+                      onChange={(e) =>
+                        updatePricingPlan(pkg.id, planIndex, { price: e.target.value })
+                      }
+                      placeholder="Price (e.g. Rs. 40,000)"
+                    />
+                  </div>
+
+                  {plan.features.map((feature, fi) => (
+                    <div
+                      key={fi}
+                      style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 6 }}
+                    >
+                      <input
+                        className="admin-input"
+                        value={feature.label}
+                        onChange={(e) =>
+                          updatePricingFeature(pkg.id, planIndex, fi, { label: e.target.value })
+                        }
+                        placeholder="Feature (e.g. Hosting)"
+                      />
+                      <input
+                        className="admin-input"
+                        style={{ width: 120 }}
+                        value={feature.value}
+                        onChange={(e) =>
+                          updatePricingFeature(pkg.id, planIndex, fi, { value: e.target.value })
+                        }
+                        placeholder="✅ / ❌ / value"
+                      />
+                      <button
+                        className="admin-btn admin-btn-danger"
+                        onClick={() => removePricingFeature(pkg.id, planIndex, fi)}
+                        aria-label="Remove feature"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    className="admin-btn"
+                    onClick={() => addPricingFeature(pkg.id, planIndex)}
+                  >
+                    <Plus size={13} /> Add feature
+                  </button>
+                </div>
+              ))}
+            </div>
+          ))}
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <button className="admin-btn" onClick={addPricingPackage}>
+              <Plus size={14} /> Add package
+            </button>
+          </div>
+
+          <div className="admin-form-actions">
+            <button
+              className="admin-btn admin-btn-primary"
+              onClick={savePricing}
+              disabled={saving}
+            >
+              <Save size={14} /> {saving ? "Saving…" : "Save pricing"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function renderBranding() {
     return (
       <div className="admin-card">
@@ -1005,6 +1762,10 @@ export default function AdminPanel() {
             {tab === "careers" && renderCareerList()}
             {tab === "testimonials" && renderTestimonialList()}
             {tab === "faqs" && renderFaqList()}
+            {tab === "intro" && renderIntro()}
+            {tab === "services" && renderServices()}
+            {tab === "work" && renderWork()}
+            {tab === "pricing" && renderPricing()}
             {tab === "branding" && renderBranding()}
           </>
         )}
