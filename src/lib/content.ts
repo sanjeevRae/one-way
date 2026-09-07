@@ -79,7 +79,16 @@ export interface SiteContent {
   workSubtext: string;
   works: WorkItem[];
   pricingPackages: PricingPackage[];
+  pricingHero: string;
+  pricingNoteHeading: string;
+  pricingNoteText: string;
+  pricingNoteContact: string;
 }
+
+export const DEFAULT_PRICING_NOTE_HEADING = "Every project includes";
+export const DEFAULT_PRICING_NOTE_TEXT =
+  "A clear timeline before we start, honest communication throughout, and a handover you fully own — code, assets and accounts. Prices above are starting points in NPR and are confirmed after a short discovery call.";
+export const DEFAULT_PRICING_NOTE_CONTACT = "info@onewaynepal.com";
 
 export const DEFAULT_CONTENT: SiteContent = {
   blogs: [],
@@ -101,6 +110,10 @@ export const DEFAULT_CONTENT: SiteContent = {
   workSubtext: DEFAULT_WORK_SUBTEXT,
   works: [],
   pricingPackages: [],
+  pricingHero: "",
+  pricingNoteHeading: DEFAULT_PRICING_NOTE_HEADING,
+  pricingNoteText: DEFAULT_PRICING_NOTE_TEXT,
+  pricingNoteContact: DEFAULT_PRICING_NOTE_CONTACT,
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -188,6 +201,19 @@ export async function readContent(): Promise<SiteContent> {
               : [],
           }))
         : [],
+      pricingHero: typeof parsed.pricingHero === "string" ? parsed.pricingHero : "",
+      pricingNoteHeading:
+        typeof parsed.pricingNoteHeading === "string" && parsed.pricingNoteHeading.trim() !== ""
+          ? parsed.pricingNoteHeading
+          : DEFAULT_PRICING_NOTE_HEADING,
+      pricingNoteText:
+        typeof parsed.pricingNoteText === "string" && parsed.pricingNoteText.trim() !== ""
+          ? parsed.pricingNoteText
+          : DEFAULT_PRICING_NOTE_TEXT,
+      pricingNoteContact:
+        typeof parsed.pricingNoteContact === "string" && parsed.pricingNoteContact.trim() !== ""
+          ? parsed.pricingNoteContact
+          : DEFAULT_PRICING_NOTE_CONTACT,
     };
   } catch {
     return {
@@ -210,6 +236,10 @@ export async function readContent(): Promise<SiteContent> {
       workSubtext: DEFAULT_WORK_SUBTEXT,
       works: [],
       pricingPackages: DEFAULT_PRICING_PACKAGES,
+      pricingHero: "",
+      pricingNoteHeading: DEFAULT_PRICING_NOTE_HEADING,
+      pricingNoteText: DEFAULT_PRICING_NOTE_TEXT,
+      pricingNoteContact: DEFAULT_PRICING_NOTE_CONTACT,
     };
   }
 }

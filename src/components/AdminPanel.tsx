@@ -34,6 +34,10 @@ const EMPTY_CONTENT: SiteContent = {
   workSubtext: "",
   works: [],
   pricingPackages: [],
+  pricingHero: "",
+  pricingNoteHeading: "",
+  pricingNoteText: "",
+  pricingNoteContact: "",
 };
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -141,6 +145,10 @@ export default function AdminPanel() {
   const [workSubtextDraft, setWorkSubtextDraft] = useState("");
   const [worksDraft, setWorksDraft] = useState<WorkItem[]>([]);
   const [pricingDraft, setPricingDraft] = useState<PricingPackage[]>([]);
+  const [pricingHeroDraft, setPricingHeroDraft] = useState("");
+  const [pricingNoteHeadingDraft, setPricingNoteHeadingDraft] = useState("");
+  const [pricingNoteTextDraft, setPricingNoteTextDraft] = useState("");
+  const [pricingNoteContactDraft, setPricingNoteContactDraft] = useState("");
   const [uploading, setUploading] = useState(false);
   const [privacyDraft, setPrivacyDraft] = useState({ title: "", content: "" });
   const [termsDraft, setTermsDraft] = useState({ title: "", content: "" });
@@ -173,6 +181,10 @@ export default function AdminPanel() {
           workSubtext: typeof clean.workSubtext === "string" ? clean.workSubtext : "",
           works: Array.isArray(clean.works) ? clean.works : [],
           pricingPackages: Array.isArray(clean.pricingPackages) ? clean.pricingPackages : [],
+          pricingHero: typeof clean.pricingHero === "string" ? clean.pricingHero : "",
+          pricingNoteHeading: typeof clean.pricingNoteHeading === "string" ? clean.pricingNoteHeading : "",
+          pricingNoteText: typeof clean.pricingNoteText === "string" ? clean.pricingNoteText : "",
+          pricingNoteContact: typeof clean.pricingNoteContact === "string" ? clean.pricingNoteContact : "",
         });
         if (_backend) setBackend(_backend.backend);
         setHeroLogoDraft(typeof clean.heroLogo === "string" ? clean.heroLogo : "");
@@ -213,6 +225,10 @@ export default function AdminPanel() {
               }))
             : []
         );
+        setPricingHeroDraft(typeof clean.pricingHero === "string" ? clean.pricingHero : "");
+        setPricingNoteHeadingDraft(typeof clean.pricingNoteHeading === "string" ? clean.pricingNoteHeading : "");
+        setPricingNoteTextDraft(typeof clean.pricingNoteText === "string" ? clean.pricingNoteText : "");
+        setPricingNoteContactDraft(typeof clean.pricingNoteContact === "string" ? clean.pricingNoteContact : "");
         setPricingDraft(
           Array.isArray(clean.pricingPackages)
             ? clean.pricingPackages.map((p, i) => ({
@@ -567,7 +583,27 @@ export default function AdminPanel() {
           })),
         })),
       })),
+      pricingHero: pricingHeroDraft.trim(),
+      pricingNoteHeading: pricingNoteHeadingDraft.trim(),
+      pricingNoteText: pricingNoteTextDraft.trim(),
+      pricingNoteContact: pricingNoteContactDraft.trim(),
     });
+  }
+
+  async function handlePricingHeroUpload(file: File) {
+    setUploading(true);
+    setStatus(null);
+    try {
+      const url = await uploadImage(file);
+      setPricingHeroDraft(url);
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Upload failed.",
+      });
+    } finally {
+      setUploading(false);
+    }
   }
 
   function updatePricingPackage(id: string, patch: Partial<PricingPackage>) {
@@ -1427,6 +1463,84 @@ export default function AdminPanel() {
             Each package is shown in the left sidebar of /pricing and contains three
             plans. Use ✅ / ❌ as feature values to render check / cross icons.
           </p>
+
+          <div className="admin-field">
+            <label>Top banner image (optional, full-width, 30% of screen height)</label>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              {pricingHeroDraft && (
+                <Image
+                  src={pricingHeroDraft}
+                  alt="Pricing banner preview"
+                  width={120}
+                  height={56}
+                  unoptimized
+                  style={{ objectFit: "cover", borderRadius: 8 }}
+                />
+              )}
+              <label className="admin-btn" style={{ cursor: "pointer" }}>
+                <Upload size={14} /> {uploading ? "Uploading…" : "Upload image"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+                  style={{ display: "none" }}
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePricingHeroUpload(file);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              {pricingHeroDraft && (
+                <button
+                  className="admin-btn admin-btn-danger"
+                  onClick={() => setPricingHeroDraft("")}
+                >
+                  Remove image
+                </button>
+              )}
+            </div>
+            <input
+              className="admin-input"
+              style={{ marginTop: 10 }}
+              value={pricingHeroDraft}
+              onChange={(e) => setPricingHeroDraft(e.target.value)}
+              placeholder="…or paste an image URL (/uploads/banner.jpg or https://…)"
+            />
+            <p className="admin-hint">
+              Leave empty to hide the banner completely. A wide image (1920×600 or
+              similar) looks best.
+            </p>
+          </div>
+
+          <div className="admin-field">
+            <label>"Every project includes" heading</label>
+            <input
+              className="admin-input"
+              value={pricingNoteHeadingDraft}
+              onChange={(e) => setPricingNoteHeadingDraft(e.target.value)}
+              placeholder="Every project includes"
+            />
+          </div>
+          <div className="admin-field">
+            <label>"Every project includes" text</label>
+            <textarea
+              className="admin-input"
+              rows={3}
+              value={pricingNoteTextDraft}
+              onChange={(e) => setPricingNoteTextDraft(e.target.value)}
+            />
+          </div>
+          <div className="admin-field">
+            <label>Contact email (shown at the bottom)</label>
+            <input
+              className="admin-input"
+              type="email"
+              value={pricingNoteContactDraft}
+              onChange={(e) => setPricingNoteContactDraft(e.target.value)}
+              placeholder="info@onewaynepal.com"
+            />
+          </div>
 
           {pricingDraft.map((pkg) => (
             <div

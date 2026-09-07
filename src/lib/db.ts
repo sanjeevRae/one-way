@@ -18,6 +18,11 @@ import type { ServiceItem, WorkItem } from "./sections";
 import type { PricingPackage } from "./pricing";
 import { DEFAULT_PRICING_PACKAGES } from "./pricing";
 import {
+  DEFAULT_PRICING_NOTE_CONTACT,
+  DEFAULT_PRICING_NOTE_HEADING,
+  DEFAULT_PRICING_NOTE_TEXT,
+} from "./content";
+import {
   DEFAULT_INTRO_HEADING,
   DEFAULT_INTRO_KICKER,
 } from "./intro";
@@ -186,7 +191,7 @@ export async function getContentStore(): Promise<SiteContent> {
     );
 
     const [settingRows] = await pool.query(
-      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext')"
+      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext', 'pricing_hero', 'pricing_note_heading', 'pricing_note_text', 'pricing_note_contact')"
     );
 
     const [introStatRows] = await pool.query(
@@ -255,6 +260,14 @@ export async function getContentStore(): Promise<SiteContent> {
       : DEFAULT_SERVICES_MORE;
     const workHeading = settingMap.get("work_heading")?.trim() || DEFAULT_WORK_HEADING;
     const workSubtext = settingMap.get("work_subtext")?.trim() || DEFAULT_WORK_SUBTEXT;
+
+    const pricingHero = settingMap.get("pricing_hero")?.trim() || "";
+    const pricingNoteHeading =
+      settingMap.get("pricing_note_heading")?.trim() || DEFAULT_PRICING_NOTE_HEADING;
+    const pricingNoteText =
+      settingMap.get("pricing_note_text")?.trim() || DEFAULT_PRICING_NOTE_TEXT;
+    const pricingNoteContact =
+      settingMap.get("pricing_note_contact")?.trim() || DEFAULT_PRICING_NOTE_CONTACT;
 
     let pricingPackages: PricingPackage[] = [];
     if ((pricingPackageRows as any[]).length > 0) {
@@ -327,6 +340,11 @@ export async function getContentStore(): Promise<SiteContent> {
       works,
 
       pricingPackages,
+
+      pricingHero,
+      pricingNoteHeading,
+      pricingNoteText,
+      pricingNoteContact,
 
       privacyPolicy:
         legalMap.get("privacy") ?? {
@@ -559,6 +577,10 @@ export async function saveContentStore(
       ["services_more", String(content.servicesMore ?? 4)],
       ["work_heading", content.workHeading || ""],
       ["work_subtext", content.workSubtext || ""],
+      ["pricing_hero", content.pricingHero || ""],
+      ["pricing_note_heading", content.pricingNoteHeading || ""],
+      ["pricing_note_text", content.pricingNoteText || ""],
+      ["pricing_note_contact", content.pricingNoteContact || ""],
     ];
 
     for (const [key, value] of settings) {
