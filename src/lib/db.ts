@@ -13,6 +13,21 @@ import type {
   SiteContent,
   Testimonial,
 } from "./content";
+import type { IntroStat } from "./intro";
+import type { ServiceItem, WorkItem } from "./sections";
+import type { PricingPackage } from "./pricing";
+import { DEFAULT_PRICING_PACKAGES } from "./pricing";
+import {
+  DEFAULT_INTRO_HEADING,
+  DEFAULT_INTRO_KICKER,
+} from "./intro";
+import {
+  DEFAULT_SERVICES_HEADING,
+  DEFAULT_SERVICES_KICKER,
+  DEFAULT_SERVICES_MORE,
+  DEFAULT_WORK_HEADING,
+  DEFAULT_WORK_SUBTEXT,
+} from "./sections";
 
 /* ------------------------------------------------------------------ */
 /* Database configuration                                             */
@@ -149,7 +164,8 @@ export async function getContentStore(): Promise<SiteContent> {
   const pool = getPool();
 
   if (pool) {
-    const [blogRows] = await pool.query(
+    try {
+      const [blogRows] = await pool.query(
       "SELECT * FROM blogs ORDER BY date DESC, id DESC"
     );
 
@@ -170,7 +186,27 @@ export async function getContentStore(): Promise<SiteContent> {
     );
 
     const [settingRows] = await pool.query(
-      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image')"
+      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext')"
+    );
+
+    const [introStatRows] = await pool.query(
+      "SELECT * FROM intro_stats ORDER BY sort_order ASC, id ASC"
+    );
+
+    const [serviceRows] = await pool.query(
+      "SELECT * FROM services ORDER BY sort_order ASC, id ASC"
+    );
+
+    const [workRows] = await pool.query(
+      "SELECT * FROM works ORDER BY sort_order ASC, id ASC"
+    );
+
+    const [pricingPackageRows] = await pool.query(
+      "SELECT * FROM pricing_packages ORDER BY sort_order ASC, id ASC"
+    );
+
+    const [pricingPlanRows] = await pool.query(
+      "SELECT * FROM pricing_plans ORDER BY sort_order ASC, id ASC"
     );
 
     const settingMap = new Map<string, string>();
@@ -180,6 +216,80 @@ export async function getContentStore(): Promise<SiteContent> {
 
     const heroLogo = settingMap.get("hero_logo") ?? "";
     const heroImage = settingMap.get("hero_image") ?? "";
+
+    const introKicker =
+      settingMap.get("intro_kicker")?.trim() || DEFAULT_INTRO_KICKER;
+    const introHeading =
+      settingMap.get("intro_heading")?.trim() || DEFAULT_INTRO_HEADING;
+
+    const introStats: IntroStat[] = (introStatRows as any[]).map((row) => ({
+      id: String(row.id),
+      value: Number(row.stat_value) || 0,
+      label: String(row.label ?? ""),
+    }));
+
+    const services: ServiceItem[] = (serviceRows as any[]).map((row) => ({
+      id: String(row.id),
+      label: String(row.label ?? ""),
+      icon: String(row.icon ?? "Code2"),
+    }));
+
+    const works: WorkItem[] = (workRows as any[]).map((row) => ({
+      id: String(row.id),
+      title: String(row.title ?? ""),
+      text: String(row.text ?? ""),
+      image: String(row.image ?? ""),
+      tags: String(row.tags ?? "")
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+    }));
+
+    const servicesKicker =
+      settingMap.get("services_kicker")?.trim() || DEFAULT_SERVICES_KICKER;
+    const servicesHeading =
+      settingMap.get("services_heading")?.trim() || DEFAULT_SERVICES_HEADING;
+    const servicesMoreRaw = Number(settingMap.get("services_more"));
+    const servicesMore = Number.isFinite(servicesMoreRaw)
+      ? servicesMoreRaw
+      : DEFAULT_SERVICES_MORE;
+    const workHeading = settingMap.get("work_heading")?.trim() || DEFAULT_WORK_HEADING;
+    const workSubtext = settingMap.get("work_subtext")?.trim() || DEFAULT_WORK_SUBTEXT;
+
+    let pricingPackages: PricingPackage[] = [];
+    if ((pricingPackageRows as any[]).length > 0) {
+      const plansByPackage = new Map<number, PricingPackage["plans"]>();
+      for (const row of pricingPlanRows as any[]) {
+        const pkgId = Number(row.package_id);
+        let features: PricingPackage["plans"][number]["features"] = [];
+        try {
+          const parsed = JSON.parse(String(row.features ?? "[]"));
+          if (Array.isArray(parsed)) {
+            features = parsed.map((f: any) => ({
+              label: String(f?.label ?? ""),
+              value: String(f?.value ?? ""),
+            }));
+          }
+        } catch {
+          features = [];
+        }
+        const list = plansByPackage.get(pkgId) ?? [];
+        list.push({
+          name: String(row.name ?? ""),
+          price: String(row.price ?? ""),
+          features,
+        });
+        plansByPackage.set(pkgId, list);
+      }
+
+      pricingPackages = (pricingPackageRows as any[]).map((row) => ({
+        id: String(row.id),
+        name: String(row.name ?? ""),
+        plans: plansByPackage.get(Number(row.id)) ?? [],
+      }));
+    } else {
+      pricingPackages = DEFAULT_PRICING_PACKAGES;
+    }
 
     const legalMap = new Map<string, LegalPageData>();
 
@@ -203,6 +313,21 @@ export async function getContentStore(): Promise<SiteContent> {
       heroLogo,
       heroImage,
 
+      introKicker,
+      introHeading,
+      introStats,
+
+      servicesKicker,
+      servicesHeading,
+      servicesMore,
+      services,
+
+      workHeading,
+      workSubtext,
+      works,
+
+      pricingPackages,
+
       privacyPolicy:
         legalMap.get("privacy") ?? {
           id: "",
@@ -219,6 +344,13 @@ export async function getContentStore(): Promise<SiteContent> {
           content: "",
         },
     };
+    } catch (error) {
+      // MySQL is configured but unreachable (e.g. local dev without a running
+      // MySQL, or a brief hosting outage). Fall back to the JSON store / built-in
+      // defaults instead of crashing the page.
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn("[db] MySQL unavailable, falling back to JSON store:", message);
+    }
   }
 
   /* JSON fallback */
@@ -420,6 +552,13 @@ export async function saveContentStore(
     const settings: Array<[string, string]> = [
       ["hero_logo", content.heroLogo || ""],
       ["hero_image", content.heroImage || ""],
+      ["intro_kicker", content.introKicker || ""],
+      ["intro_heading", content.introHeading || ""],
+      ["services_kicker", content.servicesKicker || ""],
+      ["services_heading", content.servicesHeading || ""],
+      ["services_more", String(content.servicesMore ?? 4)],
+      ["work_heading", content.workHeading || ""],
+      ["work_subtext", content.workSubtext || ""],
     ];
 
     for (const [key, value] of settings) {
@@ -431,6 +570,79 @@ export async function saveContentStore(
       `,
         [key, value, value]
       );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* Intro stats                                                    */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM intro_stats");
+    for (let i = 0; i < content.introStats.length; i++) {
+      const stat = content.introStats[i];
+      await conn.query(
+        "INSERT INTO intro_stats (stat_value, label, sort_order) VALUES (?, ?, ?)",
+        [Number(stat.value) || 0, String(stat.label ?? ""), i]
+      );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* Services                                                       */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM services");
+    for (let i = 0; i < content.services.length; i++) {
+      const srv = content.services[i];
+      await conn.query(
+        "INSERT INTO services (label, icon, sort_order) VALUES (?, ?, ?)",
+        [String(srv.label ?? ""), String(srv.icon ?? "Code2"), i]
+      );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* Works                                                          */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM works");
+    for (let i = 0; i < content.works.length; i++) {
+      const work = content.works[i];
+      await conn.query(
+        "INSERT INTO works (title, `text`, image, tags, sort_order) VALUES (?, ?, ?, ?, ?)",
+        [
+          String(work.title ?? ""),
+          String(work.text ?? ""),
+          String(work.image ?? ""),
+          (work.tags ?? []).map((t) => String(t).trim()).filter(Boolean).join(","),
+          i,
+        ]
+      );
+    }
+
+    /* -------------------------------------------------------------- */
+    /* Pricing packages & plans                                       */
+    /* -------------------------------------------------------------- */
+
+    await conn.query("DELETE FROM pricing_plans");
+    await conn.query("DELETE FROM pricing_packages");
+    for (let i = 0; i < content.pricingPackages.length; i++) {
+      const pkg = content.pricingPackages[i];
+      const [pkgResult]: any = await conn.query(
+        "INSERT INTO pricing_packages (name, sort_order) VALUES (?, ?)",
+        [String(pkg.name ?? ""), i]
+      );
+      const packageId = Number(pkgResult?.insertId) || 0;
+      for (let j = 0; j < pkg.plans.length; j++) {
+        const pl = pkg.plans[j];
+        await conn.query(
+          "INSERT INTO pricing_plans (package_id, name, price, features, sort_order) VALUES (?, ?, ?, ?, ?)",
+          [
+            packageId,
+            String(pl.name ?? ""),
+            String(pl.price ?? ""),
+            JSON.stringify(pl.features ?? []),
+            j,
+          ]
+        );
+      }
     }
 
     await conn.commit();

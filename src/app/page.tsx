@@ -4,6 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import ContactSlideOver from "@/components/ContactSlideOver";
+import type { IntroStat } from "@/lib/intro";
+import {
+  DEFAULT_INTRO_HEADING,
+  DEFAULT_INTRO_KICKER,
+  DEFAULT_INTRO_STATS,
+} from "@/lib/intro";
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -29,47 +35,81 @@ import {
   Megaphone,
   PenTool,
   UsersRound,
+  Globe,
+  Cloud,
+  Database,
+  LineChart,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
+import type { ServiceItem, WorkItem } from "@/lib/sections";
+import {
+  DEFAULT_SERVICES_HEADING,
+  DEFAULT_SERVICES_KICKER,
+  DEFAULT_SERVICES_MORE,
+  DEFAULT_WORK_HEADING,
+  DEFAULT_WORK_SUBTEXT,
+  SERVICE_ICONS,
+} from "@/lib/sections";
 
-const services: Array<[string, LucideIcon]> = 
-[
-  ["Web Development", Code2],
-  ["Mobile App Development", Smartphone],
-  ["AI Solutions", Bot],
-  ["UI/UX Design", PenTool],
-  ["Graphic Design", Palette],
-  ["Branding", Gem],
-  ["Digital Analytics", Megaphone],
-  
+const ICON_MAP: Record<string, LucideIcon> = {
+  Code2,
+  Smartphone,
+  Bot,
+  PenTool,
+  Palette,
+  Gem,
+  Megaphone,
+  Globe,
+  Cloud,
+  Database,
+  LineChart,
+  ShieldCheck,
+  Search,
+  UsersRound,
+};
+
+const FALLBACK_SERVICES: ServiceItem[] = [
+  { id: "s1", label: "Web Development", icon: "Code2" },
+  { id: "s2", label: "Mobile App Development", icon: "Smartphone" },
+  { id: "s3", label: "AI Solutions", icon: "Bot" },
+  { id: "s4", label: "UI/UX Design", icon: "PenTool" },
+  { id: "s5", label: "Graphic Design", icon: "Palette" },
+  { id: "s6", label: "Branding", icon: "Gem" },
+  { id: "s7", label: "Digital Analytics", icon: "Megaphone" },
 ];
 
-const works = [
+const FALLBACK_WORKS: WorkItem[] = [
   {
+    id: "w1",
     title: "Branding Design",
     text: "Create distinctive brand identities with thoughtful visuals, memorable direction, and a consistent look across every touchpoint.",
     image: "/brand.avif",
     tags: ["Branding", "Strategy", "Creative"],
   },
   {
+    id: "w2",
     title: "Application Design",
     text: "Design intuitive and engaging mobile experiences that combine clean interfaces, smooth interactions, and user-focused functionality.",
     image: "/app.avif",
     tags: ["UI/UX", "Mobile", "Digital"],
   },
   {
+    id: "w3",
     title: "AI-Powered Chatbots",
     text: "Build intelligent AI chatbots that answer questions, engage customers, capture leads, automate support, and deliver personalized experiences across your website, WhatsApp, and digital platforms.",
     image: "/ai.avif",
     tags: ["AI", "Automation", "Support"],
   },
   {
+    id: "w4",
     title: "Packaging Design",
     text: "Create eye-catching packaging that communicates your brand clearly while making your products stand out on the shelf and online.",
     image: "/pack.avif",
     tags: ["Packaging", "Branding", "Creative"],
   },
   {
+    id: "w5",
     title: "Website Design",
     text: "Build modern, responsive websites that combine strong visual design, intuitive experiences, and clear communication for your business.",
     image: "/web2.avif",
@@ -314,6 +354,16 @@ export default function Home() {
   const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
   const [heroLogo, setHeroLogo] = useState("/logo-transparent.png");
   const [heroImage, setHeroImage] = useState("/building.avif");
+  const [introKicker, setIntroKicker] = useState(DEFAULT_INTRO_KICKER);
+  const [introHeading, setIntroHeading] = useState(DEFAULT_INTRO_HEADING);
+  const [introStats, setIntroStats] = useState<IntroStat[]>(DEFAULT_INTRO_STATS);
+  const [servicesKicker, setServicesKicker] = useState(DEFAULT_SERVICES_KICKER);
+  const [servicesHeading, setServicesHeading] = useState(DEFAULT_SERVICES_HEADING);
+  const [servicesMore, setServicesMore] = useState(DEFAULT_SERVICES_MORE);
+  const [services, setServices] = useState<ServiceItem[]>(FALLBACK_SERVICES);
+  const [workHeading, setWorkHeading] = useState(DEFAULT_WORK_HEADING);
+  const [workSubtext, setWorkSubtext] = useState(DEFAULT_WORK_SUBTEXT);
+  const [works, setWorks] = useState<WorkItem[]>(FALLBACK_WORKS);
   const [faqs, setFaqs] = useState(() =>
     FALLBACK_FAQS.map((f, i) => ({ id: `f${i + 1}`, ...f }))
   );
@@ -358,6 +408,65 @@ export default function Home() {
         if (typeof data.heroImage === "string" && data.heroImage.trim() !== "") {
           setHeroImage(data.heroImage);
         }
+        if (typeof data.introKicker === "string" && data.introKicker.trim() !== "") {
+          setIntroKicker(data.introKicker);
+        }
+        if (typeof data.introHeading === "string" && data.introHeading.trim() !== "") {
+          setIntroHeading(data.introHeading);
+        }
+        if (Array.isArray(data.introStats) && data.introStats.length > 0) {
+          setIntroStats(
+            data.introStats.map(
+              (s: { id?: number | string; value: number; label: string }, i: number) => ({
+                id: String(s.id ?? i),
+                value: Number(s.value) || 0,
+                label: String(s.label ?? ""),
+              })
+            )
+          );
+        }
+        if (typeof data.servicesKicker === "string" && data.servicesKicker.trim() !== "") {
+          setServicesKicker(data.servicesKicker);
+        }
+        if (typeof data.servicesHeading === "string" && data.servicesHeading.trim() !== "") {
+          setServicesHeading(data.servicesHeading);
+        }
+        if (Number.isFinite(Number(data.servicesMore))) {
+          setServicesMore(Number(data.servicesMore));
+        }
+        if (Array.isArray(data.services) && data.services.length > 0) {
+          setServices(
+            data.services.map(
+              (s: { id?: number | string; label: string; icon?: string }, i: number) => ({
+                id: String(s.id ?? i),
+                label: String(s.label ?? ""),
+                icon: String(s.icon ?? "Code2"),
+              })
+            )
+          );
+        }
+        if (typeof data.workHeading === "string" && data.workHeading.trim() !== "") {
+          setWorkHeading(data.workHeading);
+        }
+        if (typeof data.workSubtext === "string" && data.workSubtext.trim() !== "") {
+          setWorkSubtext(data.workSubtext);
+        }
+        if (Array.isArray(data.works) && data.works.length > 0) {
+          setWorks(
+            data.works.map(
+              (
+                w: { id?: number | string; title: string; text: string; image?: string; tags?: string[] },
+                i: number
+              ) => ({
+                id: String(w.id ?? i),
+                title: String(w.title ?? ""),
+                text: String(w.text ?? ""),
+                image: String(w.image ?? "") || FALLBACK_WORKS[i % FALLBACK_WORKS.length].image,
+                tags: Array.isArray(w.tags) ? w.tags.map(String) : [],
+              })
+            )
+          );
+        }
       })
       .catch(() => {
         /* keep fallback testimonials */
@@ -401,7 +510,7 @@ export default function Home() {
     return () => {
       observer.disconnect();
     };
-  }, [workFilter]);
+  }, [workFilter, works, services, introStats, testimonials, faqs]);
 
   return (
     <main>
@@ -422,7 +531,7 @@ export default function Home() {
             <a href="#about">About</a>
             <a href="#work">Work</a>
             <a href="#services">Services</a>
-            <a href="#contact">Pricing</a>
+            <Link href="/pricing">Pricing</Link>
           </div>
           <button className="pill" onClick={() => setContactOpen(true)}>Contact</button>
           <button className="icon-button" aria-label="Contact Us" onClick={() => setContactOpen(true)}>
@@ -481,71 +590,51 @@ export default function Home() {
       </section>
 
       <section className="intro" id="about">
-        <p data-reveal="left">We are…</p>
+        <p data-reveal="left">{introKicker}</p>
         <div className="intro-content" data-reveal="right">
-          <h2 data-reveal="up">
-           A company with a simple conviction: technology 
-           should bring order, not chaos. We believe
-            that the digital spaces we build should be clean,
-             purposeful, and intuitive, freeing you to focus 
-             on what matters most-growing your business and
-              serving your community.
-          </h2>
+          <h2 data-reveal="up">{introHeading}</h2>
           <div className="stats" data-reveal="up">
-            <div data-reveal>
-              <strong>
-                <CountUp value={100}/>
-              </strong>
-              <span>Digital Ideas</span>
-            </div>
-             <div data-reveal>
-              <strong>
-                <CountUp value={6} />
-              </strong>
-              <span>Core Services</span>
-            </div>
-            <div data-reveal>
-              <strong>
-                <CountUp value={52} />
-              </strong>
-              <span>Solutions</span>
-            </div>
-            <div data-reveal>
-              <strong>
-                <CountUp value={14} />
-              </strong>
-              <span>Industries</span>
-            </div>
+            {introStats.map((stat) => (
+              <div data-reveal key={stat.id}>
+                <strong>
+                  <CountUp value={stat.value} />
+                </strong>
+                <span>{stat.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="services" id="services">
-        <p data-reveal="up">Our Services</p>
-        <h2 data-reveal="up">We aim to provide solutions for businesses worldwide.</h2>
+        <p data-reveal="up">{servicesKicker}</p>
+        <h2 data-reveal="up">{servicesHeading}</h2>
         <div className="service-bg" aria-hidden="true" />
         <div className="service-grid">
-          {services.map(([label, Icon]) => (
-            <article key={label} data-reveal>
-              <span className="service-icon">
-                <Icon size={28} strokeWidth={2.4} />
-              </span>
-              <h3>{label}</h3>
+          {services.map((service) => {
+            const Icon = ICON_MAP[service.icon] ?? Code2;
+            return (
+              <article key={service.id} data-reveal>
+                <span className="service-icon">
+                  <Icon size={28} strokeWidth={2.4} />
+                </span>
+                <h3>{service.label}</h3>
+              </article>
+            );
+          })}
+          {servicesMore > 0 && (
+            <article className="service-more" data-reveal>
+              <strong>+{servicesMore}</strong>
+              <h3>More</h3>
             </article>
-          ))}
-          <article className="service-more" data-reveal>
-            <strong>+4</strong>
-            <h3>More</h3>
-          </article>
+          )}
         </div>
       </section>
 
       <section className="work" id="work">
         <div className="work-head" data-reveal="left">
-          <h2 data-reveal="up">Selected work!</h2>
-          <p data-reveal="up">
-            A selection of work we’re proud to have created with incredible companies.
-          </p>
+          <h2 data-reveal="up">{workHeading}</h2>
+          <p data-reveal="up">{workSubtext}</p>
         </div>
         <div className="work-filters" data-reveal="up">
           {workCategories.map((cat) => (

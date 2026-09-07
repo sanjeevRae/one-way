@@ -40,6 +40,25 @@ export interface Faq {
   answer: string;
 }
 
+import {
+  DEFAULT_INTRO_HEADING,
+  DEFAULT_INTRO_KICKER,
+  DEFAULT_INTRO_STATS,
+  type IntroStat,
+} from "./intro";
+import {
+  DEFAULT_SERVICES_HEADING,
+  DEFAULT_SERVICES_KICKER,
+  DEFAULT_SERVICES_MORE,
+  DEFAULT_WORK_HEADING,
+  DEFAULT_WORK_SUBTEXT,
+  type ServiceItem,
+  type WorkItem,
+} from "./sections";
+import { DEFAULT_PRICING_PACKAGES, type PricingPackage } from "./pricing";
+
+export type { IntroStat, ServiceItem, WorkItem, PricingPackage };
+
 export interface SiteContent {
   blogs: BlogPost[];
   privacyPolicy: LegalPageData;
@@ -49,6 +68,17 @@ export interface SiteContent {
   faqs: Faq[];
   heroLogo: string;
   heroImage: string;
+  introKicker: string;
+  introHeading: string;
+  introStats: IntroStat[];
+  servicesKicker: string;
+  servicesHeading: string;
+  servicesMore: number;
+  services: ServiceItem[];
+  workHeading: string;
+  workSubtext: string;
+  works: WorkItem[];
+  pricingPackages: PricingPackage[];
 }
 
 export const DEFAULT_CONTENT: SiteContent = {
@@ -60,6 +90,17 @@ export const DEFAULT_CONTENT: SiteContent = {
   faqs: [],
   heroLogo: "",
   heroImage: "",
+  introKicker: DEFAULT_INTRO_KICKER,
+  introHeading: DEFAULT_INTRO_HEADING,
+  introStats: DEFAULT_INTRO_STATS,
+  servicesKicker: DEFAULT_SERVICES_KICKER,
+  servicesHeading: DEFAULT_SERVICES_HEADING,
+  servicesMore: DEFAULT_SERVICES_MORE,
+  services: [],
+  workHeading: DEFAULT_WORK_HEADING,
+  workSubtext: DEFAULT_WORK_SUBTEXT,
+  works: [],
+  pricingPackages: [],
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -79,6 +120,74 @@ export async function readContent(): Promise<SiteContent> {
       faqs: Array.isArray(parsed.faqs) ? parsed.faqs : [],
       heroLogo: typeof parsed.heroLogo === "string" ? parsed.heroLogo : "",
       heroImage: typeof parsed.heroImage === "string" ? parsed.heroImage : "",
+      introKicker:
+        typeof parsed.introKicker === "string" && parsed.introKicker.trim() !== ""
+          ? parsed.introKicker
+          : DEFAULT_INTRO_KICKER,
+      introHeading:
+        typeof parsed.introHeading === "string" && parsed.introHeading.trim() !== ""
+          ? parsed.introHeading
+          : DEFAULT_INTRO_HEADING,
+      introStats: Array.isArray(parsed.introStats)
+        ? parsed.introStats.map((s: any, i: number) => ({
+            id: typeof s?.id === "string" ? s.id : `s${i + 1}`,
+            value: Number.isFinite(Number(s?.value)) ? Number(s.value) : 0,
+            label: typeof s?.label === "string" ? s.label : "",
+          }))
+        : DEFAULT_INTRO_STATS,
+      servicesKicker:
+        typeof parsed.servicesKicker === "string" && parsed.servicesKicker.trim() !== ""
+          ? parsed.servicesKicker
+          : DEFAULT_SERVICES_KICKER,
+      servicesHeading:
+        typeof parsed.servicesHeading === "string" && parsed.servicesHeading.trim() !== ""
+          ? parsed.servicesHeading
+          : DEFAULT_SERVICES_HEADING,
+      servicesMore: Number.isFinite(Number(parsed.servicesMore))
+        ? Number(parsed.servicesMore)
+        : DEFAULT_SERVICES_MORE,
+      services: Array.isArray(parsed.services)
+        ? parsed.services.map((s: any, i: number) => ({
+            id: typeof s?.id === "string" ? s.id : `srv${i + 1}`,
+            label: typeof s?.label === "string" ? s.label : "",
+            icon: typeof s?.icon === "string" ? s.icon : "Code2",
+          }))
+        : [],
+      workHeading:
+        typeof parsed.workHeading === "string" && parsed.workHeading.trim() !== ""
+          ? parsed.workHeading
+          : DEFAULT_WORK_HEADING,
+      workSubtext:
+        typeof parsed.workSubtext === "string" && parsed.workSubtext.trim() !== ""
+          ? parsed.workSubtext
+          : DEFAULT_WORK_SUBTEXT,
+      works: Array.isArray(parsed.works)
+        ? parsed.works.map((w: any, i: number) => ({
+            id: typeof w?.id === "string" ? w.id : `w${i + 1}`,
+            title: typeof w?.title === "string" ? w.title : "",
+            text: typeof w?.text === "string" ? w.text : "",
+            image: typeof w?.image === "string" ? w.image : "",
+            tags: Array.isArray(w?.tags) ? w.tags.map(String) : [],
+          }))
+        : [],
+      pricingPackages: Array.isArray(parsed.pricingPackages)
+        ? parsed.pricingPackages.map((p: any, i: number) => ({
+            id: typeof p?.id === "string" ? p.id : `pkg${i + 1}`,
+            name: typeof p?.name === "string" ? p.name : "",
+            plans: Array.isArray(p?.plans)
+              ? p.plans.map((pl: any) => ({
+                  name: typeof pl?.name === "string" ? pl.name : "",
+                  price: typeof pl?.price === "string" ? pl.price : "",
+                  features: Array.isArray(pl?.features)
+                    ? pl.features.map((f: any) => ({
+                        label: typeof f?.label === "string" ? f.label : "",
+                        value: typeof f?.value === "string" ? f.value : "",
+                      }))
+                    : [],
+                }))
+              : [],
+          }))
+        : [],
     };
   } catch {
     return {
@@ -90,6 +199,17 @@ export async function readContent(): Promise<SiteContent> {
       faqs: [],
       heroLogo: "",
       heroImage: "",
+      introKicker: DEFAULT_INTRO_KICKER,
+      introHeading: DEFAULT_INTRO_HEADING,
+      introStats: DEFAULT_INTRO_STATS,
+      servicesKicker: DEFAULT_SERVICES_KICKER,
+      servicesHeading: DEFAULT_SERVICES_HEADING,
+      servicesMore: DEFAULT_SERVICES_MORE,
+      services: [],
+      workHeading: DEFAULT_WORK_HEADING,
+      workSubtext: DEFAULT_WORK_SUBTEXT,
+      works: [],
+      pricingPackages: DEFAULT_PRICING_PACKAGES,
     };
   }
 }
