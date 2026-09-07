@@ -3,12 +3,31 @@ import Image from "next/image";
 
 interface ContentShellProps {
   children: React.ReactNode;
+  showNav?: boolean;
 }
 
-/** Shared layout for subpages (blogs, legal, careers). */
-export default function ContentShell({ children }: ContentShellProps) {
+/** Shared layout for subpages (blogs, legal, careers, pricing). */
+export default function ContentShell({ children, showNav = false }: ContentShellProps) {
   return (
     <div className="content-shell">
+      {showNav && (
+        <nav className="content-nav">
+          <Link href="/" className="content-nav-brand">
+            <Image src="/icon.png" alt="One Way Nepal" width={34} height={34} priority />
+            <span>One Way Nepal</span>
+          </Link>
+          <div className="content-nav-links">
+            <Link href="/#about">About</Link>
+            <Link href="/#work">Work</Link>
+            <Link href="/#services">Services</Link>
+            <Link href="/pricing">Pricing</Link>
+          </div>
+          <Link href="/#contact" className="content-nav-cta">
+            Contact
+          </Link>
+        </nav>
+      )}
+
       <header className="content-topbar">
         <Link href="/" className="content-logo">
           <Image src="/icon.png" alt="One Way Nepal" width={34} height={34} priority />

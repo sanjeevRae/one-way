@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import ContentShell from "@/components/ContentShell";
 import PricingSelector from "@/components/PricingSelector";
 import { getContentStore } from "@/lib/db";
@@ -15,17 +16,40 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   let pricingPackages = DEFAULT_PRICING_PACKAGES;
+  let pricingHero = "";
+  let pricingNoteHeading = "Every project includes";
+  let pricingNoteText =
+    "A clear timeline before we start, honest communication throughout, and a handover you fully own — code, assets and accounts. Prices above are starting points in NPR and are confirmed after a short discovery call.";
+  let pricingNoteContact = "info@onewaynepal.com";
+
   try {
     const store = await getContentStore();
     if (store.pricingPackages.length > 0) {
       pricingPackages = store.pricingPackages;
     }
+    if (store.pricingHero) pricingHero = store.pricingHero;
+    if (store.pricingNoteHeading) pricingNoteHeading = store.pricingNoteHeading;
+    if (store.pricingNoteText) pricingNoteText = store.pricingNoteText;
+    if (store.pricingNoteContact) pricingNoteContact = store.pricingNoteContact;
   } catch (error) {
     console.warn("[pricing] content store unavailable, using defaults:", error);
   }
 
   return (
-    <ContentShell>
+    <ContentShell showNav>
+      {pricingHero && (
+        <div className="pricing-hero">
+          <Image
+            src={pricingHero}
+            alt="Pricing banner"
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+          />
+        </div>
+      )}
+
       <section className="page-hero">
         <span className="page-kicker">Pricing</span>
         <h1>Compare our packages</h1>
@@ -38,15 +62,11 @@ export default async function PricingPage() {
       <PricingSelector packages={pricingPackages} />
 
       <section className="pricing-note">
-        <h2>Every project includes</h2>
-        <p>
-          A clear timeline before we start, honest communication throughout, and a
-          handover you fully own — code, assets and accounts. Prices above are
-          starting points in NPR and are confirmed after a short discovery call.
-        </p>
+        <h2>{pricingNoteHeading}</h2>
+        <p>{pricingNoteText}</p>
         <p>
           Have something different in mind?{" "}
-          <a href="mailto:info@onewaynepal.com">info@onewaynepal.com</a>
+          <a href={`mailto:${pricingNoteContact}`}>{pricingNoteContact}</a>
         </p>
       </section>
     </ContentShell>
