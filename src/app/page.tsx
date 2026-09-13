@@ -353,7 +353,7 @@ export default function Home() {
   const [workFilter, setWorkFilter] = useState("All");
   const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
   const [heroLogo, setHeroLogo] = useState("/logo-transparent.png");
-  const [heroImage, setHeroImage] = useState("/building.avif");
+  const [heroImage, setHeroImage] = useState("");
   const [introKicker, setIntroKicker] = useState(DEFAULT_INTRO_KICKER);
   const [introHeading, setIntroHeading] = useState(DEFAULT_INTRO_HEADING);
   const [introStats, setIntroStats] = useState<IntroStat[]>(DEFAULT_INTRO_STATS);
@@ -407,6 +407,8 @@ export default function Home() {
         }
         if (typeof data.heroImage === "string" && data.heroImage.trim() !== "") {
           setHeroImage(data.heroImage);
+        } else {
+          setHeroImage("");
         }
         if (typeof data.introKicker === "string" && data.introKicker.trim() !== "") {
           setIntroKicker(data.introKicker);
@@ -550,16 +552,18 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="building" aria-hidden="true" data-reveal="up" style={{ "--reveal-delay": "0ms" } as React.CSSProperties}>
-          <Image
-            src={heroImage}
-            alt=""
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 820px) 95vw, 62vw"
-          />
-        </div>
+        {heroImage && (
+          <div className="building" aria-hidden="true" data-reveal="up" style={{ "--reveal-delay": "0ms" } as React.CSSProperties}>
+            <Image
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="(max-width: 820px) 95vw, 62vw"
+            />
+          </div>
+        )}
 
         <div className="search-panel" data-reveal="up" style={{ "--reveal-delay": "640ms" } as React.CSSProperties}>
           <div>

@@ -1717,14 +1717,31 @@ export default function AdminPanel() {
           <div className="admin-field">
             <label>Hero image (building)</label>
             <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <Image
-                src={heroImageDraft || "/building.avif"}
-                alt="Hero image preview"
-                width={120}
-                height={80}
-                unoptimized
-                style={{ objectFit: "cover", background: "#fff", borderRadius: 8 }}
-              />
+              {heroImageDraft ? (
+                <Image
+                  src={heroImageDraft}
+                  alt="Hero image preview"
+                  width={120}
+                  height={80}
+                  unoptimized
+                  style={{ objectFit: "cover", background: "#fff", borderRadius: 8 }}
+                />
+              ) : (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    height: 80,
+                    padding: "0 14px",
+                    border: "1px dashed #cbd5d0",
+                    borderRadius: 8,
+                    color: "#6b736f",
+                    fontSize: 13,
+                  }}
+                >
+                  No image — hero image hidden
+                </span>
+              )}
               <label className="admin-btn" style={{ cursor: "pointer" }}>
                 <Upload size={14} /> {uploading ? "Uploading…" : "Upload image"}
                 <input
@@ -1756,8 +1773,8 @@ export default function AdminPanel() {
               placeholder="…or paste an image URL (/uploads/hero.webp or https://…)"
             />
             <p className="admin-hint">
-              Leave empty to use the default hero image (/building.avif). A wide image (roughly 4:3
-              ratio) looks best in the hero section.
+              Leave empty to hide the hero image completely — only your uploaded
+              image is shown. A wide image (roughly 4:3 ratio) looks best.
             </p>
           </div>
           <div className="admin-form-actions">
