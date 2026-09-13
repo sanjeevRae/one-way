@@ -1873,6 +1873,8 @@ footer h3 {
 @media (max-width: 820px) {
   .hero {
     min-height: 720px;
+    margin: 0;
+    border-radius: 0; /* remove the rounded hero image border on mobile */
   }
 
   .nav-links,
@@ -1886,7 +1888,7 @@ footer h3 {
 
   .nav {
     min-height: 56px;
-    padding: 0 clamp(16px, 5vw, 24px);
+    padding: 0 10px 0 16px; /* less right padding → menu button sits nearer the edge */
   }
 
   .brand {
@@ -1903,12 +1905,13 @@ footer h3 {
   }
 
   .hero-copy h1 {
-    font-size: clamp(28px, 7.5vw, 42px);
+    font-size: clamp(24px, 7vw, 36px);
+    line-height: 1.15;
   }
 
   .hero-copy p:last-child {
     max-width: 520px;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.5;
   }
 
@@ -1918,39 +1921,44 @@ footer h3 {
     opacity: 1;
   }
 
+  /* Compact, centered info panel — low height so it never covers hero text */
   .search-panel {
-    right: 18px;
-    bottom: 22px;
-    left: 18px;
+    right: 12px;
+    bottom: 12px;
+    left: 12px; /* equal insets → horizontally centered */
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
     min-height: 0;
-    padding: 12px;
-    border-radius: 18px;
+    padding: 10px;
+    border-radius: 16px;
   }
 
   .search-panel div {
-    min-height: 48px;
-    gap: 8px;
-    padding: 0 10px;
+    min-height: 40px;
+    gap: 7px;
+    padding: 6px 9px;
     border-right: 0;
-    border-radius: 12px;
-    background: #f6f7f6;
-    font-size: 10px;
-    line-height: 1.2;
+    border-radius: 10px;
+    background: #f2f4f3;
+    font-size: 10.5px;
+    line-height: 1.25;
+    align-items: center;
   }
 
   .search-panel svg {
-    width: 30px;
-    height: 30px;
-    padding: 8px;
+    width: 26px;
+    height: 26px;
+    padding: 6px;
+    border-radius: 8px;
     background: #ffffff;
   }
 
-  .search-panel button {
+  .search-panel button,
+  .search-panel .search-panel-cta {
     grid-column: 1 / -1;
-    height: 48px;
-    border-radius: 12px;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 13px;
   }
 
   .service-grid,
@@ -3015,6 +3023,65 @@ footer h3 {
   .content-nav-links {
     display: none;
   }
+}
+
+/* ---------------- Mobile nav menu (hamburger dropdown) ---------------- */
+
+.mobile-menu {
+  position: absolute;
+  top: 64px; /* just below the navbar */
+  right: 12px;
+  left: 12px;
+  z-index: 30;
+  display: grid;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(8, 15, 20, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+  animation: mobileMenuIn 180ms ease;
+}
+
+@keyframes mobileMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.mobile-menu a,
+.mobile-menu-contact {
+  display: block;
+  width: 100%;
+  padding: 13px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mobile-menu a:hover,
+.mobile-menu-contact:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.mobile-menu-contact {
+  margin-top: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  text-align: center;
+  font-weight: 600;
 }
 
 .career-apply {
