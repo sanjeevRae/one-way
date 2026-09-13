@@ -350,6 +350,7 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [workFilter, setWorkFilter] = useState("All");
   const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
   const [heroLogo, setHeroLogo] = useState("/logo-transparent.png");
@@ -536,10 +537,33 @@ export default function Home() {
             <Link href="/pricing">Pricing</Link>
           </div>
           <button className="pill" onClick={() => setContactOpen(true)}>Contact</button>
-          <button className="icon-button" aria-label="Contact Us" onClick={() => setContactOpen(true)}>
-            <Menu size={18} />
+          <button
+            className="icon-button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </nav>
+
+        {menuOpen && (
+          <div className="mobile-menu">
+            <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+            <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+            <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
+            <Link href="/pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
+            <button
+              className="mobile-menu-contact"
+              onClick={() => {
+                setMenuOpen(false);
+                setContactOpen(true);
+              }}
+            >
+              Contact
+            </button>
+          </div>
+        )}
 
         <div className="hero-copy">
           <h1 data-reveal="up" style={{ "--reveal-delay": "220ms" } as React.CSSProperties}>
