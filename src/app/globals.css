@@ -1872,9 +1872,15 @@ footer h3 {
 
 @media (max-width: 820px) {
   .hero {
-    min-height: 720px;
+    min-height: 100svh; /* cover the full mobile viewport */
     margin: 0;
     border-radius: 0; /* remove the rounded hero image border on mobile */
+    padding: 24px 0 0; /* zero side padding → navbar spans edge-to-edge */
+  }
+
+  .hero-copy {
+    padding-left: clamp(18px, 5vw, 28px);
+    padding-right: clamp(18px, 5vw, 28px);
   }
 
   .nav-links,
@@ -1888,7 +1894,7 @@ footer h3 {
 
   .nav {
     min-height: 56px;
-    padding: 0 10px 0 16px; /* less right padding → menu button sits nearer the edge */
+    padding: 0 6px 0 14px; /* menu button sits flush at the far right */
   }
 
   .brand {
@@ -1901,7 +1907,8 @@ footer h3 {
   }
 
   .hero-copy {
-    margin-top: 70px;
+    margin-top: 40px;
+    padding-top: 60px; /* pushes h1 + p down on mobile; search-panel stays put (it's absolute) */
   }
 
   .hero-copy h1 {
@@ -1911,6 +1918,7 @@ footer h3 {
 
   .hero-copy p:last-child {
     max-width: 520px;
+    margin-top: 64px; /* a little more breathing room between h1 and p on mobile */
     font-size: 15px;
     line-height: 1.5;
   }
@@ -1986,6 +1994,20 @@ footer h3 {
   .intro {
     gap: 28px;
     padding-top: 78px;
+  }
+
+  .intro h2 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .stats strong {
+    font-size: clamp(34px, 9vw, 44px);
+  }
+
+  .stats span {
+    font-size: 14px;
+    margin-top: 10px;
   }
 
   .services h2 {
@@ -2160,7 +2182,7 @@ footer h3 {
 
 @media (max-width: 560px) {
   .hero {
-    min-height: 650px;
+    min-height: 100svh;
   }
 
   .stats {
@@ -2942,15 +2964,18 @@ footer h3 {
 /* ---------------- Pricing page hero image (30vh, admin-editable) ---------------- */
 
 .pricing-hero {
-  position: relative;
   width: 100%;
-  height: 30vh;
-  min-height: 180px;
   overflow: hidden;
 }
 
+/* Natural aspect ratio: the whole image is always visible — never cropped.
+   Very tall images are capped and contained instead of being cut off. */
 .pricing-hero img {
-  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
 }
 
 /* ---------------- Site navbar for subpages (dark bar variant) ---------------- */

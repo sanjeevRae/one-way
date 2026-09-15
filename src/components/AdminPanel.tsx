@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Save, Trash2, X, Upload } from "lucide-react";
+import { Pencil, Plus, Save, Trash2, X, Upload, ChevronDown } from "lucide-react";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import type { BlogPost, Career, Faq, SiteContent, Testimonial } from "@/lib/content";
 import type { IntroStat } from "@/lib/intro";
@@ -146,6 +146,8 @@ export default function AdminPanel() {
   const [worksDraft, setWorksDraft] = useState<WorkItem[]>([]);
   const [pricingDraft, setPricingDraft] = useState<PricingPackage[]>([]);
   const [pricingHeroDraft, setPricingHeroDraft] = useState("");
+  const [pricingSettingsOpen, setPricingSettingsOpen] = useState(false);
+  const [expandedPackage, setExpandedPackage] = useState<string | null>(null);
   const [pricingNoteHeadingDraft, setPricingNoteHeadingDraft] = useState("");
   const [pricingNoteTextDraft, setPricingNoteTextDraft] = useState("");
   const [pricingNoteContactDraft, setPricingNoteContactDraft] = useState("");
@@ -611,10 +613,11 @@ export default function AdminPanel() {
   }
 
   function addPricingPackage() {
+    const id = `pkg${Date.now()}`;
     setPricingDraft((prev) => [
       ...prev,
       {
-        id: `pkg${Date.now()}`,
+        id,
         name: "",
         plans: [
           { name: "ECONOMIC", price: "", features: [] },
@@ -623,6 +626,7 @@ export default function AdminPanel() {
         ],
       },
     ]);
+    setExpandedPackage(id); // open it straight away for editing
   }
 
   function removePricingPackage(id: string) {
@@ -1460,10 +1464,26 @@ export default function AdminPanel() {
         </div>
         <div className="admin-form">
           <p className="admin-hint">
-            Each package is shown in the left sidebar of /pricing and contains three
-            plans. Use ✅ / ❌ as feature values to render check / cross icons.
+            Each package appears in the left sidebar of /pricing with its three plans
+            (Economic / Budget / Standard). Click a package to edit it. Tip: use ✅ and
+            ❌ as feature values to show ticks and crosses on the site.
           </p>
 
+          <button
+            type="button"
+            className="admin-btn"
+            onClick={() => setPricingSettingsOpen((v) => !v)}
+            style={{ marginBottom: 14, justifyContent: "flex-start" }}
+          >
+            <ChevronDown
+              size={14}
+              style={{ transform: pricingSettingsOpen ? "rotate(180deg)" : "none" }}
+            />
+            {pricingSettingsOpen ? "Hide" : "Edit"} page banner & footer text
+          </button>
+
+          {pricingSettingsOpen && (
+            <>
           <div className="admin-field">
             <label>Top banner image (optional, full-width, 30% of screen height)</label>
             <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1541,105 +1561,162 @@ export default function AdminPanel() {
               placeholder="info@onewaynepal.com"
             />
           </div>
+            </>
+          )}
 
-          {pricingDraft.map((pkg) => (
-            <div
-              key={pkg.id}
-              style={{
-                border: "1px solid #e2e6e2",
-                borderRadius: 10,
-                padding: 14,
-                marginBottom: 14,
-              }}
-            >
-              <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
-                <input
-                  className="admin-input"
-                  value={pkg.name}
-                  onChange={(e) => updatePricingPackage(pkg.id, { name: e.target.value })}
-                  placeholder="Package name (e.g. BUSINESS PACKAGE)"
-                  style={{ fontWeight: 700, textTransform: "uppercase" }}
-                />
-                <button
-                  className="admin-btn admin-btn-danger"
-                  onClick={() => removePricingPackage(pkg.id)}
-                  aria-label={`Remove package ${pkg.name || ""}`}
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
+          <label className="admin-hint" style={{ display: "block", marginBottom: 8 }}>
+            {pricingDraft.length} package{pricingDraft.length === 1 ? "" : "s"}
+          </label>
 
-              {pkg.plans.map((plan, planIndex) => (
+          {pricingDraft.map((pkg) => {
+            const open = expandedPackage === pkg.id;
+            return (
+              <div
+                key={pkg.id}
+                style={{
+                  border: `1px solid ${open ? "#0d5b53" : "#e2e6e2"}`,
+                  borderRadius: 10,
+                  marginBottom: 10,
+                  overflow: "hidden",
+                }}
+              >
+                {/* Collapsed row — click Edit to open this package */}
                 <div
-                  key={planIndex}
                   style={{
-                    borderTop: "1px solid #f0f3f1",
-                    paddingTop: 12,
-                    marginBottom: 12,
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "center",
+                    padding: 10,
+                    background: open ? "#f3f8f7" : "#ffffff",
                   }}
                 >
-                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <input
-                      className="admin-input"
-                      style={{ width: 150 }}
-                      value={plan.name}
-                      onChange={(e) =>
-                        updatePricingPlan(pkg.id, planIndex, { name: e.target.value })
-                      }
-                      placeholder="Plan name"
-                    />
-                    <input
-                      className="admin-input"
-                      value={plan.price}
-                      onChange={(e) =>
-                        updatePricingPlan(pkg.id, planIndex, { price: e.target.value })
-                      }
-                      placeholder="Price (e.g. Rs. 40,000)"
-                    />
-                  </div>
-
-                  {plan.features.map((feature, fi) => (
-                    <div
-                      key={fi}
-                      style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 6 }}
-                    >
-                      <input
-                        className="admin-input"
-                        value={feature.label}
-                        onChange={(e) =>
-                          updatePricingFeature(pkg.id, planIndex, fi, { label: e.target.value })
-                        }
-                        placeholder="Feature (e.g. Hosting)"
-                      />
-                      <input
-                        className="admin-input"
-                        style={{ width: 120 }}
-                        value={feature.value}
-                        onChange={(e) =>
-                          updatePricingFeature(pkg.id, planIndex, fi, { value: e.target.value })
-                        }
-                        placeholder="✅ / ❌ / value"
-                      />
-                      <button
-                        className="admin-btn admin-btn-danger"
-                        onClick={() => removePricingFeature(pkg.id, planIndex, fi)}
-                        aria-label="Remove feature"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  ))}
-
                   <button
+                    type="button"
                     className="admin-btn"
-                    onClick={() => addPricingFeature(pkg.id, planIndex)}
+                    onClick={() => setExpandedPackage(open ? null : pkg.id)}
+                    aria-expanded={open}
+                    style={{ flex: "none" }}
                   >
-                    <Plus size={13} /> Add feature
+                    <ChevronDown
+                      size={14}
+                      style={{ transform: open ? "rotate(180deg)" : "none" }}
+                    />
+                    {open ? "Close" : "Edit"}
+                  </button>
+                  <input
+                    className="admin-input"
+                    value={pkg.name}
+                    onChange={(e) => updatePricingPackage(pkg.id, { name: e.target.value })}
+                    placeholder="Package name (e.g. BUSINESS PACKAGE)"
+                    style={{ fontWeight: 700, textTransform: "uppercase" }}
+                  />
+                  <span className="admin-hint" style={{ flex: "none", margin: 0 }}>
+                    {pkg.plans.length} plans
+                  </span>
+                  <button
+                    className="admin-btn admin-btn-danger"
+                    onClick={() => removePricingPackage(pkg.id)}
+                    aria-label={`Remove package ${pkg.name || ""}`}
+                    style={{ flex: "none" }}
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </div>
-              ))}
-            </div>
-          ))}
+
+                {open && (
+                  <div style={{ padding: "12px 12px 4px" }}>
+                    {pkg.plans.map((plan, planIndex) => (
+                      <div
+                        key={planIndex}
+                        style={{
+                          border: "1px solid #eef1ef",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                          background: "#fdfdfd",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                          <input
+                            className="admin-input"
+                            style={{ width: 150, fontWeight: 600 }}
+                            value={plan.name}
+                            onChange={(e) =>
+                              updatePricingPlan(pkg.id, planIndex, { name: e.target.value })
+                            }
+                            placeholder="Plan name (e.g. ECONOMIC)"
+                          />
+                          <input
+                            className="admin-input"
+                            value={plan.price}
+                            onChange={(e) =>
+                              updatePricingPlan(pkg.id, planIndex, { price: e.target.value })
+                            }
+                            placeholder="Price (e.g. Rs. 40,000)"
+                          />
+                        </div>
+
+                  <div style={{ display: "grid", gap: 6 }}>
+                          {plan.features.map((feature, fi) => (
+                            <div
+                              key={fi}
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns: "minmax(0, 1fr) 120px auto",
+                                gap: 6,
+                                alignItems: "center",
+                              }}
+                            >
+                              <input
+                                className="admin-input"
+                                value={feature.label}
+                                onChange={(e) =>
+                                  updatePricingFeature(pkg.id, planIndex, fi, {
+                                    label: e.target.value,
+                                  })
+                                }
+                                placeholder="Feature (e.g. Hosting)"
+                              />
+                              <input
+                                className="admin-input"
+                                value={feature.value}
+                                onChange={(e) =>
+                                  updatePricingFeature(pkg.id, planIndex, fi, {
+                                    value: e.target.value,
+                                  })
+                                }
+                                placeholder="✅ / ❌ / value"
+                              />
+                              <button
+                                className="admin-btn admin-btn-danger"
+                                onClick={() => removePricingFeature(pkg.id, planIndex, fi)}
+                                aria-label={`Remove ${feature.label || "feature"}`}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <button
+                          className="admin-btn"
+                          style={{ marginTop: 10 }}
+                          onClick={() => addPricingFeature(pkg.id, planIndex)}
+                        >
+                          <Plus size={13} /> Add feature
+                        </button>
+                      </div>
+                    ))}
+
+                    <p className="admin-hint" style={{ marginTop: 0 }}>
+                      Left box = feature name · right box = value (✅ / ❌ or text such as
+                      &quot;4 GB&quot;).
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             <button className="admin-btn" onClick={addPricingPackage}>

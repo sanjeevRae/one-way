@@ -37,20 +37,9 @@ export default async function PricingPage() {
 
   return (
     <ContentShell showNav>
-      {pricingHero && (
-        <div className="pricing-hero">
-          <Image
-            src={pricingHero}
-            alt="Pricing banner"
-            fill
-            priority
-            unoptimized
-            sizes="100vw"
-          />
-        </div>
-      )}
 
-      <section className="page-hero">
+
+       <section className="page-hero">
         <span className="page-kicker">Pricing</span>
         <h1>Compare our packages</h1>
         <p>
@@ -58,6 +47,22 @@ export default async function PricingPage() {
           plans side by side.
         </p>
       </section>
+      {pricingHero && (
+        <div className="pricing-hero">
+          <Image
+            src={pricingHero}
+            alt="Pricing banner"
+            width={1920}
+            height={720}
+            priority
+            unoptimized
+            sizes="100vw"
+            style={{ width: "100%", height: "auto" }}
+          />
+        </div>
+      )}
+
+     
 
       <PricingSelector packages={pricingPackages} />
 
