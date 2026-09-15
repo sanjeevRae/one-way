@@ -47,6 +47,8 @@ export default async function PricingPage() {
           plans side by side.
         </p>
       </section>
+
+
       {pricingHero && (
         <div className="pricing-hero">
           <Image
@@ -61,7 +63,6 @@ export default async function PricingPage() {
           />
         </div>
       )}
-
      
 
       <PricingSelector packages={pricingPackages} />

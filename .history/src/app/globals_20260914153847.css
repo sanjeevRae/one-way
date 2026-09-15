@@ -1908,7 +1908,7 @@ footer h3 {
 
   .hero-copy {
     margin-top: 40px;
-    padding-top: 60px; /* pushes h1 + p down on mobile; search-panel stays put (it's absolute) */
+    padding-top: 80px; /* pushes h1 + p down on mobile; search-panel stays put (it's absolute) */
   }
 
   .hero-copy h1 {
@@ -1918,7 +1918,6 @@ footer h3 {
 
   .hero-copy p:last-child {
     max-width: 520px;
-    margin-top: 64px; /* a little more breathing room between h1 and p on mobile */
     font-size: 15px;
     line-height: 1.5;
   }
@@ -2964,18 +2963,15 @@ footer h3 {
 /* ---------------- Pricing page hero image (30vh, admin-editable) ---------------- */
 
 .pricing-hero {
+  position: relative;
   width: 100%;
+  height: 30vh;
+  min-height: 180px;
   overflow: hidden;
 }
 
-/* Natural aspect ratio: the whole image is always visible — never cropped.
-   Very tall images are capped and contained instead of being cut off. */
 .pricing-hero img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 60vh;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 /* ---------------- Site navbar for subpages (dark bar variant) ---------------- */
