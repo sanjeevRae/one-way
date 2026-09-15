@@ -132,7 +132,6 @@ button {
   pointer-events: none;
 }
 
-.nav,
 .hero-copy,
 .search-panel,
 .intro,
@@ -153,7 +152,10 @@ button {
   justify-content: space-between;
   gap: 24px;
   min-height: 72px;
-  padding: 0 clamp(24px, 4vw, 56px);
+  /* Cancel the .hero side padding so the navbar spans the full width and the
+     brand sits on the far left edge. */
+  margin-inline: calc(-1 * clamp(42px, 5.4vw, 92px));
+  padding: 0 clamp(20px, 3vw, 44px);
   background: transparent;
   font-size: 14px;
   color: white;
@@ -1894,6 +1896,7 @@ footer h3 {
 
   .nav {
     min-height: 56px;
+    margin-inline: 0; /* mobile hero has no side padding — cancel the desktop pull */
     padding: 0 6px 0 14px; /* menu button sits flush at the far right */
   }
 
@@ -2787,6 +2790,7 @@ footer h3 {
   grid-template-columns: minmax(210px, 0.72fr) repeat(3, minmax(0, 1fr));
   gap: 14px;
   align-items: start;
+  margin-top: clamp(18px, 2.6vw, 32px); /* space above the comparison table */
 }
 
 .pricing-sidebar {
@@ -2965,6 +2969,7 @@ footer h3 {
 
 .pricing-hero {
   width: 100%;
+  margin-bottom: clamp(24px, 3.5vw, 44px); /* space between banner and the content below */
   overflow: hidden;
 }
 

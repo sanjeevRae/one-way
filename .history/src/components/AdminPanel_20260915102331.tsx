@@ -1464,7 +1464,8 @@ export default function AdminPanel() {
         </div>
         <div className="admin-form">
           <p className="admin-hint">
-             Click a package to edit it. Tip: use ✅ and
+            Each package appears in the left sidebar of /pricing with its three plans
+            (Economic / Budget / Standard). Click a package to edit it. Tip: use ✅ and
             ❌ as feature values to show ticks and crosses on the site.
           </p>
 
