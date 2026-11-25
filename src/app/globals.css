@@ -1518,6 +1518,16 @@ button {
   object-fit: cover;
 }
 
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 700;
+  color: #1f3d33;
+}
+
 @keyframes testimonial-left-to-right {
   from {
     transform: translateX(-50%);
@@ -1730,6 +1740,15 @@ footer > div:nth-child(4) {
   margin: 0;
 
   color: rgba(255, 255, 255, 0.72);
+}
+
+.footer-contact a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-contact a:hover {
+  text-decoration: underline;
 }
 
 .footer-contact svg {

@@ -40,5 +40,19 @@
       "type": "Full-time",
       "description": "Design and deploy AI assistants, automation and analytics for client businesses. Strong grounding in prompt engineering and API integration required."
     }
-  ]
+  ],
+  "contactAddress": "",
+  "contactPhone": "",
+  "contactEmail": "",
+  "socialFacebook": "",
+  "socialInstagram": "",
+  "socialTiktok": "",
+  "sectionVisibility": {
+    "intro": true,
+    "services": true,
+    "work": true,
+    "process": true,
+    "testimonials": true,
+    "faqs": true
+  }
 }

@@ -56,8 +56,13 @@ import {
   type WorkItem,
 } from "./sections";
 import { DEFAULT_PRICING_PACKAGES, type PricingPackage } from "./pricing";
+import {
+  DEFAULT_SECTION_VISIBILITY,
+  normalizeSectionVisibility,
+  type SectionVisibility,
+} from "./site";
 
-export type { IntroStat, ServiceItem, WorkItem, PricingPackage };
+export type { IntroStat, ServiceItem, WorkItem, PricingPackage, SectionVisibility };
 
 export interface SiteContent {
   blogs: BlogPost[];
@@ -83,6 +88,15 @@ export interface SiteContent {
   pricingNoteHeading: string;
   pricingNoteText: string;
   pricingNoteContact: string;
+  /** Footer contact + social links; "" means unset (footer uses defaults). */
+  contactAddress: string;
+  contactPhone: string;
+  contactEmail: string;
+  socialFacebook: string;
+  socialInstagram: string;
+  socialTiktok: string;
+  /** Homepage section show/hide switches from the admin Branding tab. */
+  sectionVisibility: SectionVisibility;
 }
 
 export const DEFAULT_PRICING_NOTE_HEADING = "Every project includes";
@@ -114,6 +128,13 @@ export const DEFAULT_CONTENT: SiteContent = {
   pricingNoteHeading: DEFAULT_PRICING_NOTE_HEADING,
   pricingNoteText: DEFAULT_PRICING_NOTE_TEXT,
   pricingNoteContact: DEFAULT_PRICING_NOTE_CONTACT,
+  contactAddress: "",
+  contactPhone: "",
+  contactEmail: "",
+  socialFacebook: "",
+  socialInstagram: "",
+  socialTiktok: "",
+  sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -214,6 +235,13 @@ export async function readContent(): Promise<SiteContent> {
         typeof parsed.pricingNoteContact === "string" && parsed.pricingNoteContact.trim() !== ""
           ? parsed.pricingNoteContact
           : DEFAULT_PRICING_NOTE_CONTACT,
+      contactAddress: typeof parsed.contactAddress === "string" ? parsed.contactAddress : "",
+      contactPhone: typeof parsed.contactPhone === "string" ? parsed.contactPhone : "",
+      contactEmail: typeof parsed.contactEmail === "string" ? parsed.contactEmail : "",
+      socialFacebook: typeof parsed.socialFacebook === "string" ? parsed.socialFacebook : "",
+      socialInstagram: typeof parsed.socialInstagram === "string" ? parsed.socialInstagram : "",
+      socialTiktok: typeof parsed.socialTiktok === "string" ? parsed.socialTiktok : "",
+      sectionVisibility: normalizeSectionVisibility(parsed.sectionVisibility),
     };
   } catch {
     return {
@@ -240,6 +268,13 @@ export async function readContent(): Promise<SiteContent> {
       pricingNoteHeading: DEFAULT_PRICING_NOTE_HEADING,
       pricingNoteText: DEFAULT_PRICING_NOTE_TEXT,
       pricingNoteContact: DEFAULT_PRICING_NOTE_CONTACT,
+      contactAddress: "",
+      contactPhone: "",
+      contactEmail: "",
+      socialFacebook: "",
+      socialInstagram: "",
+      socialTiktok: "",
+      sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
     };
   }
 }

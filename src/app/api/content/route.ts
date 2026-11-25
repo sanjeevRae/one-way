@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getContentStore, getBackendInfo, saveContentStore } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { ValidationError } from "@/lib/site";
 import type { SiteContent } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,12 @@ export async function PUT(request: Request) {
     await saveContentStore(body);
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { ok: false, error: error.message },
+        { status: 400 }
+      );
+    }
     console.error("[api/content] PUT failed:", error);
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Save failed" },

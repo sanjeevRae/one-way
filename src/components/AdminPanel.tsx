@@ -10,6 +10,14 @@ import type { IntroStat } from "@/lib/intro";
 import type { ServiceItem, WorkItem } from "@/lib/sections";
 import { SERVICE_ICONS } from "@/lib/sections";
 import type { PricingPackage } from "@/lib/pricing";
+import {
+  DEFAULT_CONTACT_ADDRESS,
+  DEFAULT_CONTACT_EMAIL,
+  DEFAULT_CONTACT_PHONE,
+  DEFAULT_SECTION_VISIBILITY,
+  normalizeSectionVisibility,
+  type SectionVisibility,
+} from "@/lib/site";
 
 type Tab = "blogs" | "privacy" | "terms" | "careers" | "testimonials" | "faqs" | "branding" | "intro" | "services" | "work" | "pricing";
 type Status = { kind: "success" | "error"; message: string } | null;
@@ -38,6 +46,13 @@ const EMPTY_CONTENT: SiteContent = {
   pricingNoteHeading: "",
   pricingNoteText: "",
   pricingNoteContact: "",
+  contactAddress: "",
+  contactPhone: "",
+  contactEmail: "",
+  socialFacebook: "",
+  socialInstagram: "",
+  socialTiktok: "",
+  sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
 };
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -134,6 +149,14 @@ export default function AdminPanel() {
   const [draftFaq, setDraftFaq] = useState<Faq | null>(null);
   const [heroLogoDraft, setHeroLogoDraft] = useState("");
   const [heroImageDraft, setHeroImageDraft] = useState("");
+  const [contactAddressDraft, setContactAddressDraft] = useState("");
+  const [contactPhoneDraft, setContactPhoneDraft] = useState("");
+  const [contactEmailDraft, setContactEmailDraft] = useState("");
+  const [socialFacebookDraft, setSocialFacebookDraft] = useState("");
+  const [socialInstagramDraft, setSocialInstagramDraft] = useState("");
+  const [socialTiktokDraft, setSocialTiktokDraft] = useState("");
+  const [sectionVisibilityDraft, setSectionVisibilityDraft] =
+    useState<SectionVisibility>({ ...DEFAULT_SECTION_VISIBILITY });
   const [introKickerDraft, setIntroKickerDraft] = useState("");
   const [introHeadingDraft, setIntroHeadingDraft] = useState("");
   const [introStatsDraft, setIntroStatsDraft] = useState<IntroStat[]>([]);
@@ -187,10 +210,24 @@ export default function AdminPanel() {
           pricingNoteHeading: typeof clean.pricingNoteHeading === "string" ? clean.pricingNoteHeading : "",
           pricingNoteText: typeof clean.pricingNoteText === "string" ? clean.pricingNoteText : "",
           pricingNoteContact: typeof clean.pricingNoteContact === "string" ? clean.pricingNoteContact : "",
+          contactAddress: typeof clean.contactAddress === "string" ? clean.contactAddress : "",
+          contactPhone: typeof clean.contactPhone === "string" ? clean.contactPhone : "",
+          contactEmail: typeof clean.contactEmail === "string" ? clean.contactEmail : "",
+          socialFacebook: typeof clean.socialFacebook === "string" ? clean.socialFacebook : "",
+          socialInstagram: typeof clean.socialInstagram === "string" ? clean.socialInstagram : "",
+          socialTiktok: typeof clean.socialTiktok === "string" ? clean.socialTiktok : "",
+          sectionVisibility: normalizeSectionVisibility(clean.sectionVisibility),
         });
         if (_backend) setBackend(_backend.backend);
         setHeroLogoDraft(typeof clean.heroLogo === "string" ? clean.heroLogo : "");
         setHeroImageDraft(typeof clean.heroImage === "string" ? clean.heroImage : "");
+        setContactAddressDraft(typeof clean.contactAddress === "string" ? clean.contactAddress : "");
+        setContactPhoneDraft(typeof clean.contactPhone === "string" ? clean.contactPhone : "");
+        setContactEmailDraft(typeof clean.contactEmail === "string" ? clean.contactEmail : "");
+        setSocialFacebookDraft(typeof clean.socialFacebook === "string" ? clean.socialFacebook : "");
+        setSocialInstagramDraft(typeof clean.socialInstagram === "string" ? clean.socialInstagram : "");
+        setSocialTiktokDraft(typeof clean.socialTiktok === "string" ? clean.socialTiktok : "");
+        setSectionVisibilityDraft(normalizeSectionVisibility(clean.sectionVisibility));
         setIntroKickerDraft(typeof clean.introKicker === "string" ? clean.introKicker : "");
         setIntroHeadingDraft(typeof clean.introHeading === "string" ? clean.introHeading : "");
         setIntroStatsDraft(
@@ -279,7 +316,10 @@ export default function AdminPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
       });
-      if (!res.ok) throw new Error("Server rejected the update");
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Server rejected the update");
+      }
       setContent(next);
       setStatus({ kind: "success", message: "Saved successfully." });
     } catch (error) {
@@ -456,7 +496,18 @@ export default function AdminPanel() {
   }
 
   function saveBranding() {
-    persist({ ...content, heroLogo: heroLogoDraft.trim(), heroImage: heroImageDraft.trim() });
+    persist({
+      ...content,
+      heroLogo: heroLogoDraft.trim(),
+      heroImage: heroImageDraft.trim(),
+      contactAddress: contactAddressDraft.trim(),
+      contactPhone: contactPhoneDraft.trim(),
+      contactEmail: contactEmailDraft.trim(),
+      socialFacebook: socialFacebookDraft.trim(),
+      socialInstagram: socialInstagramDraft.trim(),
+      socialTiktok: socialTiktokDraft.trim(),
+      sectionVisibility: sectionVisibilityDraft,
+    });
   }
 
   function saveIntro() {
@@ -1851,6 +1902,112 @@ export default function AdminPanel() {
             <p className="admin-hint">
               Leave empty to hide the hero image completely — only your uploaded
               image is shown. A wide image (roughly 4:3 ratio) looks best.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Footer address</label>
+            <input
+              className="admin-input"
+              value={contactAddressDraft}
+              onChange={(e) => setContactAddressDraft(e.target.value)}
+              placeholder={DEFAULT_CONTACT_ADDRESS}
+            />
+            <p className="admin-hint">
+              Shown in the footer. Leave empty to use the default ({DEFAULT_CONTACT_ADDRESS}).
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Footer phone</label>
+            <input
+              className="admin-input"
+              value={contactPhoneDraft}
+              onChange={(e) => setContactPhoneDraft(e.target.value)}
+              placeholder={DEFAULT_CONTACT_PHONE}
+            />
+            <p className="admin-hint">
+              Shown in the footer and tapped-to-call on mobile. Leave empty to use the
+              default ({DEFAULT_CONTACT_PHONE}).
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Footer email</label>
+            <input
+              className="admin-input"
+              value={contactEmailDraft}
+              onChange={(e) => setContactEmailDraft(e.target.value)}
+              placeholder={DEFAULT_CONTACT_EMAIL}
+            />
+            <p className="admin-hint">
+              Shown in the footer. Leave empty to use the default ({DEFAULT_CONTACT_EMAIL}).
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Facebook link</label>
+            <input
+              className="admin-input"
+              value={socialFacebookDraft}
+              onChange={(e) => setSocialFacebookDraft(e.target.value)}
+              placeholder="https://www.facebook.com/yourpage"
+            />
+            <p className="admin-hint">
+              Full link to your Facebook page. Leave empty and the footer icon stays unlinked.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Instagram link</label>
+            <input
+              className="admin-input"
+              value={socialInstagramDraft}
+              onChange={(e) => setSocialInstagramDraft(e.target.value)}
+              placeholder="https://www.instagram.com/yourpage"
+            />
+            <p className="admin-hint">
+              Full link to your Instagram profile. Leave empty and the footer icon stays unlinked.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>TikTok link</label>
+            <input
+              className="admin-input"
+              value={socialTiktokDraft}
+              onChange={(e) => setSocialTiktokDraft(e.target.value)}
+              placeholder="https://www.tiktok.com/@yourpage"
+            />
+            <p className="admin-hint">
+              Full link to your TikTok profile. Leave empty and the footer icon stays unlinked.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label>Homepage sections</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {(
+                [
+                  ["intro", "Intro (About)"],
+                  ["services", "Our Services"],
+                  ["work", "Selected Work"],
+                  ["process", "Process (How We Work)"],
+                  ["testimonials", "Testimonials (Client Reviews)"],
+                  ["faqs", "FAQs"],
+                ] as Array<[keyof SectionVisibility, string]>
+              ).map(([key, label]) => (
+                <label
+                  key={key}
+                  style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 400, cursor: "pointer" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={sectionVisibilityDraft[key]}
+                    onChange={(e) =>
+                      setSectionVisibilityDraft((prev) => ({ ...prev, [key]: e.target.checked }))
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="admin-hint">
+              Turn a section off to hide it on the homepage. Services, Work, Testimonials and
+              FAQs also stay hidden automatically while they have no content in the database.
             </p>
           </div>
           <div className="admin-form-actions">

@@ -33,6 +33,7 @@ import {
   DEFAULT_WORK_HEADING,
   DEFAULT_WORK_SUBTEXT,
 } from "./sections";
+import { validateAndNormalizeBranding } from "./site";
 
 /* ------------------------------------------------------------------ */
 /* Database configuration                                             */
@@ -191,7 +192,7 @@ export async function getContentStore(): Promise<SiteContent> {
     );
 
     const [settingRows] = await pool.query(
-      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext', 'pricing_hero', 'pricing_note_heading', 'pricing_note_text', 'pricing_note_contact')"
+      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext', 'pricing_hero', 'pricing_note_heading', 'pricing_note_text', 'pricing_note_contact', 'contact_address', 'contact_phone', 'contact_email', 'social_facebook', 'social_instagram', 'social_tiktok', 'visible_intro', 'visible_services', 'visible_work', 'visible_process', 'visible_testimonials', 'visible_faqs')"
     );
 
     const [introStatRows] = await pool.query(
@@ -268,6 +269,22 @@ export async function getContentStore(): Promise<SiteContent> {
       settingMap.get("pricing_note_text")?.trim() || DEFAULT_PRICING_NOTE_TEXT;
     const pricingNoteContact =
       settingMap.get("pricing_note_contact")?.trim() || DEFAULT_PRICING_NOTE_CONTACT;
+
+    const contactAddress = settingMap.get("contact_address") ?? "";
+    const contactPhone = settingMap.get("contact_phone") ?? "";
+    const contactEmail = settingMap.get("contact_email") ?? "";
+    const socialFacebook = settingMap.get("social_facebook") ?? "";
+    const socialInstagram = settingMap.get("social_instagram") ?? "";
+    const socialTiktok = settingMap.get("social_tiktok") ?? "";
+    // Only an explicit "0" hides a section — a missing key means visible.
+    const sectionVisibility = {
+      intro: settingMap.get("visible_intro") !== "0",
+      services: settingMap.get("visible_services") !== "0",
+      work: settingMap.get("visible_work") !== "0",
+      process: settingMap.get("visible_process") !== "0",
+      testimonials: settingMap.get("visible_testimonials") !== "0",
+      faqs: settingMap.get("visible_faqs") !== "0",
+    };
 
     let pricingPackages: PricingPackage[] = [];
     if ((pricingPackageRows as any[]).length > 0) {
@@ -346,6 +363,14 @@ export async function getContentStore(): Promise<SiteContent> {
       pricingNoteText,
       pricingNoteContact,
 
+      contactAddress,
+      contactPhone,
+      contactEmail,
+      socialFacebook,
+      socialInstagram,
+      socialTiktok,
+      sectionVisibility,
+
       privacyPolicy:
         legalMap.get("privacy") ?? {
           id: "",
@@ -385,6 +410,11 @@ export async function getContentStore(): Promise<SiteContent> {
 export async function saveContentStore(
   content: SiteContent
 ): Promise<void> {
+  // Validate + normalize the admin-editable branding fields (footer contact,
+  // social links, section visibility) before anything is persisted, on both
+  // the MySQL and JSON paths. Throws ValidationError on bad input.
+  validateAndNormalizeBranding(content);
+
   const pool = getPool();
 
   if (!pool) {
@@ -581,6 +611,18 @@ export async function saveContentStore(
       ["pricing_note_heading", content.pricingNoteHeading || ""],
       ["pricing_note_text", content.pricingNoteText || ""],
       ["pricing_note_contact", content.pricingNoteContact || ""],
+      ["contact_address", content.contactAddress || ""],
+      ["contact_phone", content.contactPhone || ""],
+      ["contact_email", content.contactEmail || ""],
+      ["social_facebook", content.socialFacebook || ""],
+      ["social_instagram", content.socialInstagram || ""],
+      ["social_tiktok", content.socialTiktok || ""],
+      ["visible_intro", content.sectionVisibility.intro ? "1" : "0"],
+      ["visible_services", content.sectionVisibility.services ? "1" : "0"],
+      ["visible_work", content.sectionVisibility.work ? "1" : "0"],
+      ["visible_process", content.sectionVisibility.process ? "1" : "0"],
+      ["visible_testimonials", content.sectionVisibility.testimonials ? "1" : "0"],
+      ["visible_faqs", content.sectionVisibility.faqs ? "1" : "0"],
     ];
 
     for (const [key, value] of settings) {
