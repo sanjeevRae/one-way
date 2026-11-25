@@ -40,12 +40,7 @@ export interface Faq {
   answer: string;
 }
 
-import {
-  DEFAULT_INTRO_HEADING,
-  DEFAULT_INTRO_KICKER,
-  DEFAULT_INTRO_STATS,
-  type IntroStat,
-} from "./intro";
+import type { IntroStat } from "./intro";
 import {
   DEFAULT_SERVICES_HEADING,
   DEFAULT_SERVICES_KICKER,
@@ -113,9 +108,9 @@ export const DEFAULT_CONTENT: SiteContent = {
   faqs: [],
   heroLogo: "",
   heroImage: "",
-  introKicker: DEFAULT_INTRO_KICKER,
-  introHeading: DEFAULT_INTRO_HEADING,
-  introStats: DEFAULT_INTRO_STATS,
+  introKicker: "",
+  introHeading: "",
+  introStats: [],
   servicesKicker: DEFAULT_SERVICES_KICKER,
   servicesHeading: DEFAULT_SERVICES_HEADING,
   servicesMore: DEFAULT_SERVICES_MORE,
@@ -154,21 +149,15 @@ export async function readContent(): Promise<SiteContent> {
       faqs: Array.isArray(parsed.faqs) ? parsed.faqs : [],
       heroLogo: typeof parsed.heroLogo === "string" ? parsed.heroLogo : "",
       heroImage: typeof parsed.heroImage === "string" ? parsed.heroImage : "",
-      introKicker:
-        typeof parsed.introKicker === "string" && parsed.introKicker.trim() !== ""
-          ? parsed.introKicker
-          : DEFAULT_INTRO_KICKER,
-      introHeading:
-        typeof parsed.introHeading === "string" && parsed.introHeading.trim() !== ""
-          ? parsed.introHeading
-          : DEFAULT_INTRO_HEADING,
+      introKicker: typeof parsed.introKicker === "string" ? parsed.introKicker : "",
+      introHeading: typeof parsed.introHeading === "string" ? parsed.introHeading : "",
       introStats: Array.isArray(parsed.introStats)
         ? parsed.introStats.map((s: any, i: number) => ({
             id: typeof s?.id === "string" ? s.id : `s${i + 1}`,
             value: Number.isFinite(Number(s?.value)) ? Number(s.value) : 0,
             label: typeof s?.label === "string" ? s.label : "",
           }))
-        : DEFAULT_INTRO_STATS,
+        : [],
       servicesKicker:
         typeof parsed.servicesKicker === "string" && parsed.servicesKicker.trim() !== ""
           ? parsed.servicesKicker
@@ -253,9 +242,9 @@ export async function readContent(): Promise<SiteContent> {
       faqs: [],
       heroLogo: "",
       heroImage: "",
-      introKicker: DEFAULT_INTRO_KICKER,
-      introHeading: DEFAULT_INTRO_HEADING,
-      introStats: DEFAULT_INTRO_STATS,
+      introKicker: "",
+      introHeading: "",
+      introStats: [],
       servicesKicker: DEFAULT_SERVICES_KICKER,
       servicesHeading: DEFAULT_SERVICES_HEADING,
       servicesMore: DEFAULT_SERVICES_MORE,

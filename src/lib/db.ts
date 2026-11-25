@@ -23,10 +23,6 @@ import {
   DEFAULT_PRICING_NOTE_TEXT,
 } from "./content";
 import {
-  DEFAULT_INTRO_HEADING,
-  DEFAULT_INTRO_KICKER,
-} from "./intro";
-import {
   DEFAULT_SERVICES_HEADING,
   DEFAULT_SERVICES_KICKER,
   DEFAULT_SERVICES_MORE,
@@ -223,10 +219,8 @@ export async function getContentStore(): Promise<SiteContent> {
     const heroLogo = settingMap.get("hero_logo") ?? "";
     const heroImage = settingMap.get("hero_image") ?? "";
 
-    const introKicker =
-      settingMap.get("intro_kicker")?.trim() || DEFAULT_INTRO_KICKER;
-    const introHeading =
-      settingMap.get("intro_heading")?.trim() || DEFAULT_INTRO_HEADING;
+    const introKicker = settingMap.get("intro_kicker") ?? "";
+    const introHeading = settingMap.get("intro_heading") ?? "";
 
     const introStats: IntroStat[] = (introStatRows as any[]).map((row) => ({
       id: String(row.id),

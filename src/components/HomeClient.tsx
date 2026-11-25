@@ -6,11 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import ContactSlideOver from "@/components/ContactSlideOver";
 import type { IntroStat } from "@/lib/intro";
 import {
-  DEFAULT_INTRO_HEADING,
-  DEFAULT_INTRO_KICKER,
-  DEFAULT_INTRO_STATS,
-} from "@/lib/intro";
-import {
   ArrowUpRight,
   BriefcaseBusiness,
   Building2,
@@ -184,20 +179,15 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
     ? initialContent.heroLogo
     : "/logo-transparent.png";
   const heroImage = initialContent.heroImage ?? "";
-  const introKicker = initialContent.introKicker?.trim()
-    ? initialContent.introKicker
-    : DEFAULT_INTRO_KICKER;
-  const introHeading = initialContent.introHeading?.trim()
-    ? initialContent.introHeading
-    : DEFAULT_INTRO_HEADING;
-  const introStats: IntroStat[] =
-    Array.isArray(initialContent.introStats) && initialContent.introStats.length > 0
-      ? initialContent.introStats.map((s, i) => ({
-          id: String(s.id ?? i),
-          value: Number(s.value) || 0,
-          label: String(s.label ?? ""),
-        }))
-      : DEFAULT_INTRO_STATS;
+  const introKicker = initialContent.introKicker ?? "";
+  const introHeading = initialContent.introHeading ?? "";
+  const introStats: IntroStat[] = (
+    Array.isArray(initialContent.introStats) ? initialContent.introStats : []
+  ).map((s, i) => ({
+    id: String(s.id ?? i),
+    value: Number(s.value) || 0,
+    label: String(s.label ?? ""),
+  }));
   const servicesKicker = initialContent.servicesKicker?.trim()
     ? initialContent.servicesKicker
     : DEFAULT_SERVICES_KICKER;
@@ -243,7 +233,9 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
     ...DEFAULT_SECTION_VISIBILITY,
     ...(initialContent.sectionVisibility ?? {}),
   };
-  const showIntro = visibility.intro;
+  const showIntro =
+    visibility.intro &&
+    (introKicker.trim() !== "" || introHeading.trim() !== "" || introStats.length > 0);
   const showServices = visibility.services && services.length > 0;
   const showWork = visibility.work && works.length > 0;
   const showProcess = visibility.process;
@@ -401,19 +393,21 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
 
       {showIntro && (
       <section className="intro" id="about">
-        <p data-reveal="left">{introKicker}</p>
+        {introKicker ? <p data-reveal="left">{introKicker}</p> : null}
         <div className="intro-content" data-reveal="right">
-          <h2 data-reveal="up">{introHeading}</h2>
-          <div className="stats" data-reveal="up">
-            {introStats.map((stat) => (
-              <div data-reveal key={stat.id}>
-                <strong>
-                  <CountUp value={stat.value} />
-                </strong>
-                <span>{stat.label}</span>
-              </div>
-            ))}
-          </div>
+          {introHeading ? <h2 data-reveal="up">{introHeading}</h2> : null}
+          {introStats.length > 0 ? (
+            <div className="stats" data-reveal="up">
+              {introStats.map((stat) => (
+                <div data-reveal key={stat.id}>
+                  <strong>
+                    <CountUp value={stat.value} />
+                  </strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
       )}
