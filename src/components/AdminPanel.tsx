@@ -332,6 +332,72 @@ export default function AdminPanel() {
     }
   }
 
+  /**
+   * Flips one homepage section's visibility and saves it immediately through
+   * the dedicated visibility endpoint, which merges the change into the
+   * freshly stored content server-side — so a toggle can never overwrite
+   * other content with a stale snapshot. On failure the switch rolls back.
+   */
+  async function toggleSectionVisibility(key: keyof SectionVisibility, checked: boolean) {
+    if (saving) return;
+    const previous = sectionVisibilityDraft;
+    const next = { ...previous, [key]: checked };
+    setSectionVisibilityDraft(next);
+    setSaving(true);
+    setStatus(null);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content/visibility`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionVisibility: next }),
+        }
+      );
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Server rejected the update");
+      }
+      setContent({ ...content, sectionVisibility: next });
+      setStatus({ kind: "success", message: "Saved successfully." });
+    } catch (error) {
+      setSectionVisibilityDraft(previous);
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Failed to save changes.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  /** The show/hide switch shown at the top of each section's own editor tab. */
+  function renderSectionToggle(
+    key: keyof SectionVisibility,
+    sectionName: string,
+    emptyNote?: string
+  ) {
+    return (
+      <div className="admin-field">
+        <label>Show on homepage</label>
+        <label
+          style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 400, cursor: "pointer" }}
+        >
+          <input
+            type="checkbox"
+            checked={sectionVisibilityDraft[key]}
+            disabled={saving}
+            onChange={(e) => toggleSectionVisibility(key, e.target.checked)}
+          />
+          Show the {sectionName} section on the homepage
+        </label>
+        <p className="admin-hint">
+          Saves immediately when you flip it.{emptyNote ? ` ${emptyNote}` : ""}
+        </p>
+      </div>
+    );
+  }
+
   async function logout() {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/logout`, {
@@ -1001,6 +1067,7 @@ export default function AdminPanel() {
             </button>
           </div>
           <div className="admin-form">
+            {renderSectionToggle("testimonials", "Testimonials", "It also stays hidden while there are no testimonials.")}
             <div className="admin-field">
               <label>Review *</label>
               <textarea
@@ -1094,6 +1161,7 @@ export default function AdminPanel() {
             <Plus size={14} /> New testimonial
           </button>
         </div>
+        {renderSectionToggle("testimonials", "Testimonials", "It also stays hidden while there are no testimonials.")}
         {content.testimonials.length === 0 ? (
           <p className="empty-state">No testimonials yet. Click “New testimonial” to add one.</p>
         ) : (
@@ -1144,6 +1212,7 @@ export default function AdminPanel() {
             </button>
           </div>
           <div className="admin-form">
+            {renderSectionToggle("faqs", "FAQs", "It also stays hidden while there are no FAQs.")}
             <div className="admin-field">
               <label>Question *</label>
               <input
@@ -1181,6 +1250,7 @@ export default function AdminPanel() {
             <Plus size={14} /> New FAQ
           </button>
         </div>
+        {renderSectionToggle("faqs", "FAQs", "It also stays hidden while there are no FAQs.")}
         {content.faqs.length === 0 ? (
           <p className="empty-state">No FAQs yet. Click “New FAQ” to add one.</p>
         ) : (
@@ -1215,6 +1285,7 @@ export default function AdminPanel() {
           <h2>Intro section (We are…)</h2>
         </div>
         <div className="admin-form">
+          {renderSectionToggle("intro", "Intro")}
           <div className="admin-field">
             <label>Kicker (small text above the heading)</label>
             <input
@@ -1295,6 +1366,7 @@ export default function AdminPanel() {
           <h2>Services section</h2>
         </div>
         <div className="admin-form">
+          {renderSectionToggle("services", "Services", "It also stays hidden while there are no services in the database.")}
           <div className="admin-field">
             <label>Kicker (small text)</label>
             <input
@@ -1388,6 +1460,7 @@ export default function AdminPanel() {
           <h2>Selected work gallery</h2>
         </div>
         <div className="admin-form">
+          {renderSectionToggle("work", "Selected Work", "It also stays hidden while there is no work in the database.")}
           <div className="admin-field">
             <label>Heading</label>
             <input
@@ -1997,17 +2070,18 @@ export default function AdminPanel() {
                   <input
                     type="checkbox"
                     checked={sectionVisibilityDraft[key]}
-                    onChange={(e) =>
-                      setSectionVisibilityDraft((prev) => ({ ...prev, [key]: e.target.checked }))
-                    }
+                    disabled={saving}
+                    onChange={(e) => toggleSectionVisibility(key, e.target.checked)}
                   />
                   {label}
                 </label>
               ))}
             </div>
             <p className="admin-hint">
-              Turn a section off to hide it on the homepage. Services, Work, Testimonials and
-              FAQs also stay hidden automatically while they have no content in the database.
+              Switches save immediately when flipped. Turn a section off to hide it on the
+              homepage — the same switch also appears in each section&apos;s own tab. Services,
+              Work, Testimonials and FAQs also stay hidden automatically while they have no
+              content in the database. Process is controlled only from here.
             </p>
           </div>
           <div className="admin-form-actions">
