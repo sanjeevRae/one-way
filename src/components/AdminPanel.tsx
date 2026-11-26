@@ -15,8 +15,11 @@ import {
   DEFAULT_CONTACT_EMAIL,
   DEFAULT_CONTACT_PHONE,
   DEFAULT_SECTION_VISIBILITY,
+  DEFAULT_SOCIAL_VISIBILITY,
   normalizeSectionVisibility,
+  normalizeSocialVisibility,
   type SectionVisibility,
+  type SocialVisibility,
 } from "@/lib/site";
 
 type Tab = "blogs" | "privacy" | "terms" | "careers" | "testimonials" | "faqs" | "branding" | "intro" | "services" | "work" | "pricing";
@@ -53,6 +56,7 @@ const EMPTY_CONTENT: SiteContent = {
   socialInstagram: "",
   socialTiktok: "",
   sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
+  socialVisibility: { ...DEFAULT_SOCIAL_VISIBILITY },
 };
 
 const TABS: Array<{ key: Tab; label: string }> = [
@@ -157,6 +161,8 @@ export default function AdminPanel() {
   const [socialTiktokDraft, setSocialTiktokDraft] = useState("");
   const [sectionVisibilityDraft, setSectionVisibilityDraft] =
     useState<SectionVisibility>({ ...DEFAULT_SECTION_VISIBILITY });
+  const [socialVisibilityDraft, setSocialVisibilityDraft] =
+    useState<SocialVisibility>({ ...DEFAULT_SOCIAL_VISIBILITY });
   const [introKickerDraft, setIntroKickerDraft] = useState("");
   const [introHeadingDraft, setIntroHeadingDraft] = useState("");
   const [introStatsDraft, setIntroStatsDraft] = useState<IntroStat[]>([]);
@@ -217,6 +223,7 @@ export default function AdminPanel() {
           socialInstagram: typeof clean.socialInstagram === "string" ? clean.socialInstagram : "",
           socialTiktok: typeof clean.socialTiktok === "string" ? clean.socialTiktok : "",
           sectionVisibility: normalizeSectionVisibility(clean.sectionVisibility),
+          socialVisibility: normalizeSocialVisibility(clean.socialVisibility),
         });
         if (_backend) setBackend(_backend.backend);
         setHeroLogoDraft(typeof clean.heroLogo === "string" ? clean.heroLogo : "");
@@ -228,6 +235,7 @@ export default function AdminPanel() {
         setSocialInstagramDraft(typeof clean.socialInstagram === "string" ? clean.socialInstagram : "");
         setSocialTiktokDraft(typeof clean.socialTiktok === "string" ? clean.socialTiktok : "");
         setSectionVisibilityDraft(normalizeSectionVisibility(clean.sectionVisibility));
+        setSocialVisibilityDraft(normalizeSocialVisibility(clean.socialVisibility));
         setIntroKickerDraft(typeof clean.introKicker === "string" ? clean.introKicker : "");
         setIntroHeadingDraft(typeof clean.introHeading === "string" ? clean.introHeading : "");
         setIntroStatsDraft(
@@ -333,11 +341,40 @@ export default function AdminPanel() {
   }
 
   /**
-   * Flips one homepage section's visibility and saves it immediately through
-   * the dedicated visibility endpoint, which merges the change into the
-   * freshly stored content server-side — so a toggle can never overwrite
-   * other content with a stale snapshot. On failure the switch rolls back.
+   * Sends one visibility object to the dedicated visibility endpoint, which
+   * merges it into the freshly stored content server-side — so a toggle can
+   * never overwrite other content with a stale snapshot. Resolves with the
+   * server's canonical visibility state; throws on failure so the caller can
+   * roll its switch back.
    */
+  async function putVisibility(payload: {
+    sectionVisibility?: SectionVisibility;
+    socialVisibility?: SocialVisibility;
+  }): Promise<{ sectionVisibility: SectionVisibility; socialVisibility: SocialVisibility }> {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content/visibility`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+    const data = (await res.json().catch(() => null)) as {
+      ok?: boolean;
+      error?: string;
+      sectionVisibility?: unknown;
+      socialVisibility?: unknown;
+    } | null;
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.error || "Server rejected the update");
+    }
+    return {
+      sectionVisibility: normalizeSectionVisibility(data.sectionVisibility),
+      socialVisibility: normalizeSocialVisibility(data.socialVisibility),
+    };
+  }
+
+  /** Flips one homepage section's visibility; rolls the switch back on failure. */
   async function toggleSectionVisibility(key: keyof SectionVisibility, checked: boolean) {
     if (saving) return;
     const previous = sectionVisibilityDraft;
@@ -346,19 +383,9 @@ export default function AdminPanel() {
     setSaving(true);
     setStatus(null);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/content/visibility`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sectionVisibility: next }),
-        }
-      );
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(data?.error || "Server rejected the update");
-      }
-      setContent({ ...content, sectionVisibility: next });
+      const saved = await putVisibility({ sectionVisibility: next });
+      setSectionVisibilityDraft(saved.sectionVisibility);
+      setContent({ ...content, sectionVisibility: saved.sectionVisibility });
       setStatus({ kind: "success", message: "Saved successfully." });
     } catch (error) {
       setSectionVisibilityDraft(previous);
@@ -369,6 +396,53 @@ export default function AdminPanel() {
     } finally {
       setSaving(false);
     }
+  }
+
+  /** Flips one footer social icon's visibility; rolls the switch back on failure. */
+  async function toggleSocialVisibility(key: keyof SocialVisibility, checked: boolean) {
+    if (saving) return;
+    const previous = socialVisibilityDraft;
+    const next = { ...previous, [key]: checked };
+    setSocialVisibilityDraft(next);
+    setSaving(true);
+    setStatus(null);
+    try {
+      const saved = await putVisibility({ socialVisibility: next });
+      setSocialVisibilityDraft(saved.socialVisibility);
+      setContent({ ...content, socialVisibility: saved.socialVisibility });
+      setStatus({ kind: "success", message: "Saved successfully." });
+    } catch (error) {
+      setSocialVisibilityDraft(previous);
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Failed to save changes.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  /** The show/hide switch inside each social field group in the Branding tab. */
+  function renderSocialToggle(key: keyof SocialVisibility, networkName: string) {
+    return (
+      <>
+        <label
+          style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 400, cursor: "pointer", marginTop: 8 }}
+        >
+          <input
+            type="checkbox"
+            checked={socialVisibilityDraft[key]}
+            disabled={saving}
+            onChange={(e) => toggleSocialVisibility(key, e.target.checked)}
+          />
+          Show the {networkName} icon in the footer
+        </label>
+        <p className="admin-hint">
+          Saves immediately when you flip it. The link above is saved with the Save
+          branding button.
+        </p>
+      </>
+    );
   }
 
   /** The show/hide switch shown at the top of each section's own editor tab. */
@@ -573,6 +647,7 @@ export default function AdminPanel() {
       socialInstagram: socialInstagramDraft.trim(),
       socialTiktok: socialTiktokDraft.trim(),
       sectionVisibility: sectionVisibilityDraft,
+      socialVisibility: socialVisibilityDraft,
     });
   }
 
@@ -2025,6 +2100,7 @@ export default function AdminPanel() {
             <p className="admin-hint">
               Full link to your Facebook page. Leave empty and the footer icon stays unlinked.
             </p>
+            {renderSocialToggle("facebook", "Facebook")}
           </div>
           <div className="admin-field">
             <label>Instagram link</label>
@@ -2037,6 +2113,7 @@ export default function AdminPanel() {
             <p className="admin-hint">
               Full link to your Instagram profile. Leave empty and the footer icon stays unlinked.
             </p>
+            {renderSocialToggle("instagram", "Instagram")}
           </div>
           <div className="admin-field">
             <label>TikTok link</label>
@@ -2049,6 +2126,7 @@ export default function AdminPanel() {
             <p className="admin-hint">
               Full link to your TikTok profile. Leave empty and the footer icon stays unlinked.
             </p>
+            {renderSocialToggle("tiktok", "TikTok")}
           </div>
           <div className="admin-field">
             <label>Homepage sections</label>

@@ -52,6 +52,7 @@ import {
   DEFAULT_CONTACT_EMAIL,
   DEFAULT_CONTACT_PHONE,
   DEFAULT_SECTION_VISIBILITY,
+  DEFAULT_SOCIAL_VISIBILITY,
   safeSocialUrl,
 } from "@/lib/site";
 
@@ -232,6 +233,10 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
   const visibility = {
     ...DEFAULT_SECTION_VISIBILITY,
     ...(initialContent.sectionVisibility ?? {}),
+  };
+  const socialVisibility = {
+    ...DEFAULT_SOCIAL_VISIBILITY,
+    ...(initialContent.socialVisibility ?? {}),
   };
   const showIntro =
     visibility.intro &&
@@ -730,30 +735,36 @@ export default function HomeClient({ initialContent }: { initialContent: SiteCon
             <div className="footer-social-wrap">
               <h3 className="footer-social-title">Stay in touch</h3>
               <div className="footer-socials">
-                <a href={socialFacebook} aria-label="Facebook" {...(socialFacebook !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                  <Image
-                    src="https://s.magecdn.com/social/mw-facebook.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
-                </a>
-                <a href={socialInstagram} aria-label="Instagram" {...(socialInstagram !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                  <Image
-                    src="https://s.magecdn.com/social/mw-instagram.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
-                </a>
-                <a href={socialTiktok} aria-label="TikTok" {...(socialTiktok !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                  <Image
-                    src="https://s.magecdn.com/social/mw-tiktok.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
-                </a>
+                {socialVisibility.facebook && (
+                  <a href={socialFacebook} aria-label="Facebook" {...(socialFacebook !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                    <Image
+                      src="https://s.magecdn.com/social/mw-facebook.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                    />
+                  </a>
+                )}
+                {socialVisibility.instagram && (
+                  <a href={socialInstagram} aria-label="Instagram" {...(socialInstagram !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                    <Image
+                      src="https://s.magecdn.com/social/mw-instagram.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                    />
+                  </a>
+                )}
+                {socialVisibility.tiktok && (
+                  <a href={socialTiktok} aria-label="TikTok" {...(socialTiktok !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                    <Image
+                      src="https://s.magecdn.com/social/mw-tiktok.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                    />
+                  </a>
+                )}
               </div>
             </div>
           </div>

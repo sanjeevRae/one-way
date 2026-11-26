@@ -34,6 +34,25 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   faqs: true,
 };
 
+/** Which of the footer's social icons are shown. */
+export interface SocialVisibility {
+  facebook: boolean;
+  instagram: boolean;
+  tiktok: boolean;
+}
+
+export const SOCIAL_KEYS: Array<keyof SocialVisibility> = [
+  "facebook",
+  "instagram",
+  "tiktok",
+];
+
+export const DEFAULT_SOCIAL_VISIBILITY: SocialVisibility = {
+  facebook: true,
+  instagram: true,
+  tiktok: true,
+};
+
 /** Footer values shown when the admin has not set his own. */
 export const DEFAULT_CONTACT_ADDRESS = "Tikhedebal Marg, Lalitpur";
 export const DEFAULT_CONTACT_PHONE = "+977-9828626238";
@@ -90,6 +109,22 @@ export function normalizeSectionVisibility(input: unknown): SectionVisibility {
   return out;
 }
 
+/**
+ * Same rule for the footer social icons: only an explicit `false` hides an
+ * icon — a missing key means shown.
+ */
+export function normalizeSocialVisibility(input: unknown): SocialVisibility {
+  const src =
+    input && typeof input === "object"
+      ? (input as Partial<SocialVisibility>)
+      : {};
+  const out: SocialVisibility = { ...DEFAULT_SOCIAL_VISIBILITY };
+  for (const key of SOCIAL_KEYS) {
+    out[key] = src[key] !== false;
+  }
+  return out;
+}
+
 export interface BrandingFields {
   contactAddress: string;
   contactPhone: string;
@@ -98,6 +133,7 @@ export interface BrandingFields {
   socialInstagram: string;
   socialTiktok: string;
   sectionVisibility: SectionVisibility;
+  socialVisibility: SocialVisibility;
 }
 
 const MAX_SHORT = 200;
@@ -173,4 +209,5 @@ export function validateAndNormalizeBranding(fields: BrandingFields): void {
   }
 
   fields.sectionVisibility = normalizeSectionVisibility(fields.sectionVisibility);
+  fields.socialVisibility = normalizeSocialVisibility(fields.socialVisibility);
 }

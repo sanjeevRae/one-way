@@ -54,5 +54,10 @@
     "process": true,
     "testimonials": true,
     "faqs": true
+  },
+  "socialVisibility": {
+    "facebook": true,
+    "instagram": true,
+    "tiktok": true
   }
 }

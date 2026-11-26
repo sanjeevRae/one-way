@@ -188,7 +188,7 @@ export async function getContentStore(): Promise<SiteContent> {
     );
 
     const [settingRows] = await pool.query(
-      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext', 'pricing_hero', 'pricing_note_heading', 'pricing_note_text', 'pricing_note_contact', 'contact_address', 'contact_phone', 'contact_email', 'social_facebook', 'social_instagram', 'social_tiktok', 'visible_intro', 'visible_services', 'visible_work', 'visible_process', 'visible_testimonials', 'visible_faqs')"
+      "SELECT `key`, `value` FROM site_settings WHERE `key` IN ('hero_logo', 'hero_image', 'intro_kicker', 'intro_heading', 'services_kicker', 'services_heading', 'services_more', 'work_heading', 'work_subtext', 'pricing_hero', 'pricing_note_heading', 'pricing_note_text', 'pricing_note_contact', 'contact_address', 'contact_phone', 'contact_email', 'social_facebook', 'social_instagram', 'social_tiktok', 'visible_intro', 'visible_services', 'visible_work', 'visible_process', 'visible_testimonials', 'visible_faqs', 'visible_facebook', 'visible_instagram', 'visible_tiktok')"
     );
 
     const [introStatRows] = await pool.query(
@@ -279,6 +279,12 @@ export async function getContentStore(): Promise<SiteContent> {
       testimonials: settingMap.get("visible_testimonials") !== "0",
       faqs: settingMap.get("visible_faqs") !== "0",
     };
+    // Same rule for the footer social icons: only an explicit "0" hides one.
+    const socialVisibility = {
+      facebook: settingMap.get("visible_facebook") !== "0",
+      instagram: settingMap.get("visible_instagram") !== "0",
+      tiktok: settingMap.get("visible_tiktok") !== "0",
+    };
 
     let pricingPackages: PricingPackage[] = [];
     if ((pricingPackageRows as any[]).length > 0) {
@@ -364,6 +370,7 @@ export async function getContentStore(): Promise<SiteContent> {
       socialInstagram,
       socialTiktok,
       sectionVisibility,
+      socialVisibility,
 
       privacyPolicy:
         legalMap.get("privacy") ?? {
@@ -617,6 +624,9 @@ export async function saveContentStore(
       ["visible_process", content.sectionVisibility.process ? "1" : "0"],
       ["visible_testimonials", content.sectionVisibility.testimonials ? "1" : "0"],
       ["visible_faqs", content.sectionVisibility.faqs ? "1" : "0"],
+      ["visible_facebook", content.socialVisibility.facebook ? "1" : "0"],
+      ["visible_instagram", content.socialVisibility.instagram ? "1" : "0"],
+      ["visible_tiktok", content.socialVisibility.tiktok ? "1" : "0"],
     ];
 
     for (const [key, value] of settings) {

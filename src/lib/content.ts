@@ -53,11 +53,21 @@ import {
 import { DEFAULT_PRICING_PACKAGES, type PricingPackage } from "./pricing";
 import {
   DEFAULT_SECTION_VISIBILITY,
+  DEFAULT_SOCIAL_VISIBILITY,
   normalizeSectionVisibility,
+  normalizeSocialVisibility,
   type SectionVisibility,
+  type SocialVisibility,
 } from "./site";
 
-export type { IntroStat, ServiceItem, WorkItem, PricingPackage, SectionVisibility };
+export type {
+  IntroStat,
+  ServiceItem,
+  WorkItem,
+  PricingPackage,
+  SectionVisibility,
+  SocialVisibility,
+};
 
 export interface SiteContent {
   blogs: BlogPost[];
@@ -92,6 +102,8 @@ export interface SiteContent {
   socialTiktok: string;
   /** Homepage section show/hide switches from the admin Branding tab. */
   sectionVisibility: SectionVisibility;
+  /** Footer social-icon show/hide switches from the admin Branding tab. */
+  socialVisibility: SocialVisibility;
 }
 
 export const DEFAULT_PRICING_NOTE_HEADING = "Every project includes";
@@ -130,6 +142,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   socialInstagram: "",
   socialTiktok: "",
   sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
+  socialVisibility: { ...DEFAULT_SOCIAL_VISIBILITY },
 };
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
@@ -231,6 +244,7 @@ export async function readContent(): Promise<SiteContent> {
       socialInstagram: typeof parsed.socialInstagram === "string" ? parsed.socialInstagram : "",
       socialTiktok: typeof parsed.socialTiktok === "string" ? parsed.socialTiktok : "",
       sectionVisibility: normalizeSectionVisibility(parsed.sectionVisibility),
+      socialVisibility: normalizeSocialVisibility(parsed.socialVisibility),
     };
   } catch {
     return {
@@ -264,6 +278,7 @@ export async function readContent(): Promise<SiteContent> {
       socialInstagram: "",
       socialTiktok: "",
       sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
+      socialVisibility: { ...DEFAULT_SOCIAL_VISIBILITY },
     };
   }
 }
